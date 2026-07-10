@@ -7,7 +7,7 @@ import App from './App.tsx'
 const originalFetch = window.fetch;
 window.fetch = function (input, init) {
   if (typeof input === "string" && input.startsWith("/api")) {
-    const defaultUrl = "http://m9vtp9i2sl5xk7n28lktek4e.141.148.199.81.sslip.io";
+    const defaultUrl = "https://m9vtp9i2sl5xk7n28lktek4e.141.148.199.81.sslip.io";
     const baseUrl = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "" : defaultUrl);
     input = `${baseUrl}${input}`;
   }
