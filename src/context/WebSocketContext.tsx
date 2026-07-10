@@ -23,9 +23,17 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       wsRef.current.close();
     }
 
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const host = window.location.host;
-    const wsUrl = `${protocol}//${host}/api/ws`;
+    const baseUrl = import.meta.env.VITE_API_URL || "";
+    let wsUrl = "";
+    if (baseUrl) {
+      const wsProtocol = baseUrl.startsWith("https:") ? "wss:" : "ws:";
+      const wsHost = baseUrl.replace(/^https?:\/\//, "");
+      wsUrl = `${wsProtocol}//${wsHost}/api/ws`;
+    } else {
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const host = window.location.host;
+      wsUrl = `${protocol}//${host}/api/ws`;
+    }
 
     console.log(`Connecting to WebSocket: ${wsUrl}`);
     const ws = new WebSocket(wsUrl);
