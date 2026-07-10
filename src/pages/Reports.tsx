@@ -95,11 +95,12 @@ export const Reports: React.FC = () => {
           <div className="py-6 flex justify-center items-center">
             <div className="space-y-3.5 w-full">
               {callStats.status_distribution.map((dist: any, i: number) => {
-                const colors = {
+                const colorMap: Record<string, string> = {
                   completed: "bg-emerald-500",
                   failed: "bg-rose-500",
                   rejected: "bg-amber-500"
-                }[dist.label] || "bg-slate-400";
+                };
+                const colors = colorMap[dist.label] || "bg-slate-400";
                 
                 return (
                   <div key={i} className="space-y-1">
