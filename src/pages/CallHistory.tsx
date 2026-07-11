@@ -50,6 +50,25 @@ export const CallHistory: React.FC = () => {
     }
   };
 
+  const handleExport = async (path: string, fileName: string) => {
+    try {
+      const response = await apiFetch(path, {
+        method: "GET"
+      });
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
+    } catch (err: any) {
+      alert("Failed to download export file: " + err.message);
+    }
+  };
+
   useEffect(() => {
     fetchCalls();
   }, [page, statusFilter]);
@@ -69,20 +88,20 @@ export const CallHistory: React.FC = () => {
         </div>
 
         <div className="flex gap-2">
-          <a
-            href="/api/call/export/pdf"
+          <button
+            onClick={() => handleExport("/api/call/export/pdf", "call_history_report.csv")}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
           >
             <Download size={12} />
             <span>Download CSV</span>
-          </a>
-          <a
-            href="/api/call/export/excel"
+          </button>
+          <button
+            onClick={() => handleExport("/api/call/export/excel", "call_history.xlsx")}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
           >
             <FileSpreadsheet size={12} />
             <span>Download Excel</span>
-          </a>
+          </button>
         </div>
       </div>
 
