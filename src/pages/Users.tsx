@@ -155,7 +155,7 @@ export const Users: React.FC = () => {
                     }`}>
                       {u.role?.name || "User"}
                     </span>
-                    {user?.role === "Super Admin" && u.email !== user?.email && (
+                    {user?.role === "Super Admin" && (
                       <div className="flex gap-1">
                         <button
                           onClick={() => openEditModal(u)}
@@ -164,13 +164,15 @@ export const Users: React.FC = () => {
                         >
                           <Edit2 size={12} />
                         </button>
-                        <button
-                          onClick={() => handleDeleteUser(u.id, u.email)}
-                          className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-400 hover:text-red-500 transition-colors"
-                          title="Delete User"
-                        >
-                          <Trash2 size={12} />
-                        </button>
+                        {u.email !== user?.email && (
+                          <button
+                            onClick={() => handleDeleteUser(u.id, u.email)}
+                            className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-400 hover:text-red-500 transition-colors"
+                            title="Delete User"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
@@ -248,7 +250,8 @@ export const Users: React.FC = () => {
                 <select
                   value={formRoleId}
                   onChange={(e) => setFormRoleId(e.target.value)}
-                  className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-750 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  disabled={selectedUser?.email === user?.email}
+                  className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-750 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-60"
                 >
                   <option value="1">Super Admin</option>
                   <option value="2">School Admin</option>
@@ -262,7 +265,8 @@ export const Users: React.FC = () => {
                   <select
                     value={formIsActive ? "true" : "false"}
                     onChange={(e) => setFormIsActive(e.target.value === "true")}
-                    className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-750 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    disabled={selectedUser?.email === user?.email}
+                    className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-750 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-60"
                   >
                     <option value="true">Active</option>
                     <option value="false">Inactive</option>
