@@ -3,6 +3,26 @@ import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { CreditCard, PowerOff, ShieldAlert, Clock, RefreshCw, X, Link2, Edit2, Trash2 } from "lucide-react";
 
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return "-";
+  const utcStr = dateStr.endsWith("Z") ? dateStr : `${dateStr}Z`;
+  return new Date(utcStr).toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+};
+
+const formatTime = (dateStr: string) => {
+  if (!dateStr) return "Never";
+  const utcStr = dateStr.endsWith("Z") ? dateStr : `${dateStr}Z`;
+  return new Date(utcStr).toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true
+  });
+};
+
 export const RfidCards: React.FC = () => {
   const { apiFetch, user } = useAuth();
   const { addToast } = useToast();
@@ -180,9 +200,9 @@ export const RfidCards: React.FC = () => {
                           <CreditCard size={14} />
                           <span>{c.uid}</span>
                         </td>
-                        <td className="px-6 py-4 font-medium text-slate-400">{new Date(c.assigned_at).toLocaleDateString()}</td>
+                        <td className="px-6 py-4 font-medium text-slate-400">{formatDate(c.assigned_at)}</td>
                         <td className="px-6 py-4 font-medium text-slate-400">
-                          {c.last_scanned_at ? new Date(c.last_scanned_at).toLocaleTimeString() : "Never"}
+                          {formatTime(c.last_scanned_at)}
                         </td>
                         <td className="px-6 py-4">
                           <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
@@ -247,7 +267,7 @@ export const RfidCards: React.FC = () => {
                   <div className="min-w-0 flex-1">
                     <div className="flex justify-between items-center gap-2">
                       <h4 className="font-bold text-xs truncate">{h.student_name}</h4>
-                      <span className="text-[9px] font-bold text-slate-400">{new Date(h.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span className="text-[9px] font-bold text-slate-400">{formatTime(h.timestamp)}</span>
                     </div>
                     <p className="text-[10px] text-slate-400 mt-0.5">UID: {h.rfid_uid}</p>
                     <div className="flex items-center justify-between mt-1 text-[9px] font-extrabold uppercase">

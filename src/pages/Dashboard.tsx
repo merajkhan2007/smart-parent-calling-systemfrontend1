@@ -18,6 +18,16 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
+const formatTimelineTime = (dateStr: string) => {
+  if (!dateStr) return "";
+  const utcStr = dateStr.endsWith("Z") ? dateStr : `${dateStr}Z`;
+  return new Date(utcStr).toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true
+  });
+};
+
 export const Dashboard: React.FC = () => {
   const { apiFetch } = useAuth();
   const { lastEvent } = useWebSocket();
@@ -50,26 +60,32 @@ export const Dashboard: React.FC = () => {
       
       
       // Parse scans for timeline
-      const timelineScans = (dbStats || []).map((s: any) => ({
-        id: `scan-${s.id}`,
-        type: "scan",
-        time: new Date(s.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        title: `RFID Scanned - ${s.student_name}`,
-        subtitle: `Class: ${s.class_section} | Card: ${s.rfid_uid}`,
-        tag: s.status,
-        rawTime: new Date(s.timestamp).getTime()
-      }));
+      const timelineScans = (dbStats || []).map((s: any) => {
+        const utcStr = s.timestamp && !s.timestamp.endsWith("Z") ? `${s.timestamp}Z` : s.timestamp;
+        return {
+          id: `scan-${s.id}`,
+          type: "scan",
+          time: formatTimelineTime(s.timestamp),
+          title: `RFID Scanned - ${s.student_name}`,
+          subtitle: `Class: ${s.class_section} | Card: ${s.rfid_uid}`,
+          tag: s.status,
+          rawTime: utcStr ? new Date(utcStr).getTime() : 0
+        };
+      });
 
       // Parse calls for timeline
-      const timelineCalls = (callData.calls || []).map((c: any) => ({
-        id: `call-${c.id}`,
-        type: "call",
-        time: new Date(c.call_start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        title: `Call to ${c.parent_type} of ${c.student?.name}`,
-        subtitle: `Status: ${c.status} | Duration: ${c.duration}s`,
-        tag: c.status,
-        rawTime: new Date(c.call_start).getTime()
-      }));
+      const timelineCalls = (callData.calls || []).map((c: any) => {
+        const utcStr = c.call_start && !c.call_start.endsWith("Z") ? `${c.call_start}Z` : c.call_start;
+        return {
+          id: `call-${c.id}`,
+          type: "call",
+          time: formatTimelineTime(c.call_start),
+          title: `Call to ${c.parent_type} of ${c.student?.name}`,
+          subtitle: `Status: ${c.status} | Duration: ${c.duration}s`,
+          tag: c.status,
+          rawTime: utcStr ? new Date(utcStr).getTime() : 0
+        };
+      });
 
       // Sort and slice combined timeline
       const combinedTimeline = [...timelineScans, ...timelineCalls]

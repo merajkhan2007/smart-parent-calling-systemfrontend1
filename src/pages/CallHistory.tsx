@@ -2,6 +2,20 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Search, Download, Phone, CheckCircle, XCircle, FileSpreadsheet } from "lucide-react";
 
+const formatDateTime = (dateStr: string) => {
+  if (!dateStr) return "-";
+  const utcStr = dateStr.endsWith("Z") ? dateStr : `${dateStr}Z`;
+  return new Date(utcStr).toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true
+  });
+};
+
 export const CallHistory: React.FC = () => {
   const { apiFetch } = useAuth();
 
@@ -141,7 +155,7 @@ export const CallHistory: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-3.5 font-bold text-slate-500 dark:text-slate-400">{c.device?.name || "Gate A Entrance"}</td>
-                    <td className="px-6 py-3.5 text-slate-400 font-semibold">{new Date(c.call_start).toLocaleString()}</td>
+                    <td className="px-6 py-3.5 text-slate-400 font-semibold">{formatDateTime(c.call_start)}</td>
                     <td className="px-6 py-3.5 font-semibold text-slate-600 dark:text-slate-350">{c.duration}s</td>
                     <td className="px-6 py-3.5">
                       <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase inline-flex items-center gap-1 border ${
