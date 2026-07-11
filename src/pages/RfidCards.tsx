@@ -1,20 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import { CreditCard, PowerOff, ShieldAlert, Clock, RefreshCw, X, Link2 } from "lucide-react";
+import { CreditCard, PowerOff, ShieldAlert, Clock, RefreshCw, X, Link2, Edit2, Trash2 } from "lucide-react";
 
 export const RfidCards: React.FC = () => {
-  const { apiFetch } = useAuth();
+  const { apiFetch, user } = useAuth();
   const { addToast } = useToast();
 
   const [cards, setCards] = useState<any[]>([]);
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
+  // Assign Modal State
   const [isAssignOpen, setIsAssignOpen] = useState(false);
   const [assignRfidUid, setAssignRfidUid] = useState("");
   const [assignStudentId, setAssignStudentId] = useState("");
   const [studentsList, setStudentsList] = useState<any[]>([]);
+
+  // Edit Card Modal State
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editingCard, setEditingCard] = useState<any | null>(null);
+  const [editRfidUid, setEditRfidUid] = useState("");
+  const [editStatus, setEditStatus] = useState("active");
 
   const fetchRfidData = async () => {
     setLoading(true);
@@ -27,16 +34,9 @@ export const RfidCards: React.FC = () => {
       setHistory(historyList || []);
       setStudentsList(studentsData.students || []);
     } catch (e: any) {
-      // Mock fallbacks
-      setCards([
-        { id: 1, uid: "RFID_001_ABC", status: "active", assigned_at: new Date().toISOString(), last_scanned_at: new Date().toISOString() },
-        { id: 2, uid: "RFID_002_DEF", status: "active", assigned_at: new Date().toISOString(), last_scanned_at: new Date().toISOString() },
-        { id: 3, uid: "RFID_003_GHI", status: "deactivated", assigned_at: new Date().toISOString(), last_scanned_at: new Date().toISOString() }
-      ]);
-      setHistory([
-        { id: 1, student_name: "Liam Nelson", class_section: "Class 5-A", rfid_uid: "RFID_001_ABC", timestamp: new Date().toISOString(), status: "present" },
-        { id: 2, student_name: "Olivia Smith", class_section: "Class 5-A", rfid_uid: "RFID_002_DEF", timestamp: new Date().toISOString(), status: "present" }
-      ]);
+      setCards([]);
+      setHistory([]);
+      addToast("error", e.message || "Failed to load RFID directory");
     } finally {
       setLoading(false);
     }
@@ -45,6 +45,51 @@ export const RfidCards: React.FC = () => {
   useEffect(() => {
     fetchRfidData();
   }, []);
+
+  const openAssignModal = () => {
+    setAssignRfidUid("");
+    setAssignStudentId("");
+    setIsAssignOpen(true);
+  };
+
+  const openEditModal = (c: any) => {
+    setEditingCard(c);
+    setEditRfidUid(c.uid);
+    setEditStatus(c.status);
+    setIsEditOpen(true);
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editRfidUid || !editingCard) {
+      addToast("warning", "Card UID is required");
+      return;
+    }
+
+    try {
+      await apiFetch(`/api/rfid/${editingCard.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: editRfidUid, status: editStatus })
+      });
+      addToast("success", "Card configurations updated successfully");
+      setIsEditOpen(false);
+      fetchRfidData();
+    } catch (err: any) {
+      addToast("error", err.message || "Failed to update RFID card");
+    }
+  };
+
+  const handleDeleteCard = async (id: number, uid: string) => {
+    if (!window.confirm(`Are you sure you want to delete and deregister card "${uid}" completely?`)) return;
+    try {
+      await apiFetch(`/api/rfid/${id}`, { method: "DELETE" });
+      addToast("success", "RFID card deregistered successfully");
+      fetchRfidData();
+    } catch (err: any) {
+      addToast("error", err.message || "Failed to delete card");
+    }
+  };
 
   const handleDeactivate = async (uid: string) => {
     if (!window.confirm(`Are you sure you want to deactivate and unassign card: ${uid}?`)) return;
@@ -86,13 +131,15 @@ export const RfidCards: React.FC = () => {
           <p className="text-sm text-slate-400 font-semibold">Track scanning hardware logs, assign cards to students, and toggle active tags.</p>
         </div>
 
-        <button
-          onClick={() => setIsAssignOpen(true)}
-          className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold rounded-xl shadow-md transition-all animate-pulse"
-        >
-          <Link2 size={14} />
-          <span>Assign RFID Card</span>
-        </button>
+        {(user?.role === "Super Admin" || user?.role === "School Admin") && (
+          <button
+            onClick={openAssignModal}
+            className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold rounded-xl shadow-md transition-all duration-200 hover:scale-[1.02] cursor-pointer"
+          >
+            <Link2 size={14} />
+            <span>Assign RFID Card</span>
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -138,21 +185,41 @@ export const RfidCards: React.FC = () => {
                           {c.last_scanned_at ? new Date(c.last_scanned_at).toLocaleTimeString() : "Never"}
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                             c.status === "active" ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"
                           }`}>
                             {c.status}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-right">
-                          {c.status === "active" && (
-                            <button
-                              onClick={() => handleDeactivate(c.uid)}
-                              className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-[10px] uppercase rounded-lg transition-all"
-                            >
-                              Deactivate
-                            </button>
-                          )}
+                          <div className="flex items-center justify-end gap-2">
+                            {c.status === "active" && (
+                              <button
+                                onClick={() => handleDeactivate(c.uid)}
+                                className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-[10px] uppercase rounded-lg transition-all"
+                              >
+                                Deactivate
+                              </button>
+                            )}
+                            {(user?.role === "Super Admin" || user?.role === "School Admin") && (
+                              <button
+                                onClick={() => openEditModal(c)}
+                                className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                                title="Edit Card"
+                              >
+                                <Edit2 size={12} />
+                              </button>
+                            )}
+                            {user?.role === "Super Admin" && (
+                              <button
+                                onClick={() => handleDeleteCard(c.id, c.uid)}
+                                className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                                title="Delete Card"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -200,7 +267,7 @@ export const RfidCards: React.FC = () => {
         <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 shadow-2xl animate-fade-in border border-slate-200 dark:border-slate-800">
             <div className="flex justify-between items-center pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="font-extrabold text-sm">Assign Card mapping</h3>
+              <h3 className="font-extrabold text-sm text-slate-800 dark:text-slate-100">Assign Card mapping</h3>
               <button onClick={() => setIsAssignOpen(false)} className="p-1.5 text-slate-400 hover:bg-slate-100 rounded-full">
                 <X size={18} />
               </button>
@@ -212,7 +279,7 @@ export const RfidCards: React.FC = () => {
                 <select
                   value={assignStudentId}
                   onChange={(e) => setAssignStudentId(e.target.value)}
-                  className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-750 rounded-xl text-sm focus:outline-none"
+                  className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-750 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-primary-500 text-slate-800 dark:text-slate-100"
                   required
                 >
                   <option value="">-- Choose Student --</option>
@@ -229,16 +296,64 @@ export const RfidCards: React.FC = () => {
                   value={assignRfidUid}
                   onChange={(e) => setAssignRfidUid(e.target.value)}
                   placeholder="e.g. RFID_123_XYZ"
-                  className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-750 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-750 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-primary-500 text-slate-800 dark:text-slate-100"
                   required
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs uppercase rounded-xl shadow-md"
+                className="w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs uppercase rounded-xl shadow-md cursor-pointer"
               >
                 Assign RFID
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* --- EDIT RFID CARD MODAL --- */}
+      {isEditOpen && (
+        <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 shadow-2xl animate-fade-in border border-slate-200 dark:border-slate-800">
+            <div className="flex justify-between items-center pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="font-extrabold text-sm text-slate-800 dark:text-slate-100">Edit RFID Card</h3>
+              <button onClick={() => setIsEditOpen(false)} className="p-1.5 text-slate-400 hover:bg-slate-100 rounded-full">
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <div>
+                <label className="block text-slate-400 text-[10px] uppercase font-bold mb-1.5">Card UID</label>
+                <input
+                  type="text"
+                  value={editRfidUid}
+                  onChange={(e) => setEditRfidUid(e.target.value)}
+                  placeholder="e.g. RFID_123_XYZ"
+                  className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-750 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-primary-500 text-slate-800 dark:text-slate-100"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-400 text-[10px] uppercase font-bold mb-1.5">Status</label>
+                <select
+                  value={editStatus}
+                  onChange={(e) => setEditStatus(e.target.value)}
+                  className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-750 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-primary-500 text-slate-800 dark:text-slate-100"
+                  required
+                >
+                  <option value="active">Active</option>
+                  <option value="deactivated">Deactivated</option>
+                </select>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs uppercase rounded-xl shadow-md cursor-pointer"
+              >
+                Save Changes
               </button>
             </form>
           </div>
