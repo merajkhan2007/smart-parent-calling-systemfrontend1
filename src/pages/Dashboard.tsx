@@ -28,6 +28,13 @@ const formatTimelineTime = (dateStr: string) => {
   });
 };
 
+const formatDuration = (seconds: number) => {
+  if (seconds === undefined || seconds === null) return "-";
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}m ${s}s`;
+};
+
 export const Dashboard: React.FC = () => {
   const { apiFetch } = useAuth();
   const { lastEvent } = useWebSocket();
@@ -81,7 +88,7 @@ export const Dashboard: React.FC = () => {
           type: "call",
           time: formatTimelineTime(c.call_start),
           title: `Call to ${c.parent_type} of ${c.student?.name}`,
-          subtitle: `Status: ${c.status} | Duration: ${c.duration}s`,
+          subtitle: `Status: ${c.status} | Duration: ${formatDuration(c.duration)}`,
           tag: c.status,
           rawTime: utcStr ? new Date(utcStr).getTime() : 0
         };

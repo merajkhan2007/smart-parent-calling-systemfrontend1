@@ -16,6 +16,13 @@ const formatDateTime = (dateStr: string) => {
   });
 };
 
+const formatDuration = (seconds: number) => {
+  if (seconds === undefined || seconds === null) return "-";
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}m ${s}s`;
+};
+
 export const CallHistory: React.FC = () => {
   const { apiFetch } = useAuth();
 
@@ -156,7 +163,7 @@ export const CallHistory: React.FC = () => {
                     </td>
                     <td className="px-6 py-3.5 font-bold text-slate-500 dark:text-slate-400">{c.device?.name || "Gate A Entrance"}</td>
                     <td className="px-6 py-3.5 text-slate-400 font-semibold">{formatDateTime(c.call_start)}</td>
-                    <td className="px-6 py-3.5 font-semibold text-slate-600 dark:text-slate-350">{c.duration}s</td>
+                    <td className="px-6 py-3.5 font-semibold text-slate-600 dark:text-slate-350">{formatDuration(c.duration)}</td>
                     <td className="px-6 py-3.5">
                       <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase inline-flex items-center gap-1 border ${
                         c.status === "completed" 
