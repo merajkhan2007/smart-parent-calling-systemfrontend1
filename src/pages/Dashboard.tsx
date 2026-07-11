@@ -34,7 +34,8 @@ export const Dashboard: React.FC = () => {
     online_devices: 0,
     offline_devices: 0,
     activity_timeline: [],
-    recent_calls: []
+    recent_calls: [],
+    daily_calls: []
   });
   
   const [devices, setDevices] = useState<any[]>([]);
@@ -45,6 +46,8 @@ export const Dashboard: React.FC = () => {
       const devData = await apiFetch("/api/device/status"); // device lists
       const dbStats = await apiFetch("/api/rfid/scan-history"); // scan count
       const callData = await apiFetch("/api/call/?limit=5"); // latest calls
+      const studentsData = await apiFetch("/api/students/?limit=1"); // total students
+      
       
       // Parse scans for timeline
       const timelineScans = (dbStats || []).map((s: any) => ({
@@ -74,7 +77,7 @@ export const Dashboard: React.FC = () => {
         .slice(0, 5);
 
       setStats({
-        total_students: devData.devices ? devData.devices.reduce((acc: number, d: any) => acc + (d.status === "online" ? 12 : 5), 0) : 0,
+        total_students: studentsData.total || 0,
         today_calls: data.daily_calls[data.daily_calls.length - 1]?.value || 0,
         successful_calls: data.status_distribution.find((d: any) => d.label === "completed")?.value || 0,
         rejected_calls: data.status_distribution.find((d: any) => d.label === "failed" || d.label === "rejected")?.value || 0,
@@ -83,7 +86,8 @@ export const Dashboard: React.FC = () => {
         online_devices: devData.online_count ?? 0,
         offline_devices: devData.offline_count ?? 0,
         activity_timeline: combinedTimeline,
-        recent_calls: []
+        recent_calls: [],
+        daily_calls: data.daily_calls || []
       });
       
       setDevices(devData.devices || []);
@@ -253,58 +257,43 @@ export const Dashboard: React.FC = () => {
         <div className="lg:col-span-2 saas-card bg-white dark:bg-slate-900 p-6 rounded-[24px] border border-slate-200/80 dark:border-slate-800/80 flex flex-col justify-between min-h-[350px]">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h3 className="text-sm font-bold tracking-tight text-slate-800 dark:text-slate-100">Today's Call Trends</h3>
-              <p className="text-xs text-slate-400">Hourly calling traffic density</p>
+              <h3 className="text-sm font-bold tracking-tight text-slate-800 dark:text-slate-100">Weekly Call Trends</h3>
+              <p className="text-xs text-slate-400">Daily calling traffic volume (last 7 days)</p>
             </div>
             <span className="text-[9px] uppercase font-bold text-slate-400 px-2 py-0.5 bg-slate-50 dark:bg-slate-850 rounded-md">
-              Calls vs Scans
+              Live Feed
             </span>
           </div>
 
           <div className="flex-1 flex items-end justify-between h-48 gap-3 pt-6 border-b border-slate-100 dark:border-slate-800">
-            {[
-              { hr: "08:00", calls: 40, scans: 95 },
-              { hr: "10:00", calls: 75, scans: 35 },
-              { hr: "12:00", calls: 90, scans: 60 },
-              { hr: "14:00", calls: 50, scans: 45 },
-              { hr: "16:00", calls: 95, scans: 99 },
-              { hr: "18:00", calls: 20, scans: 10 },
-              { hr: "20:00", calls: 5, scans: 2 }
-            ].map((col, idx) => (
-              <div key={idx} className="flex-1 flex flex-col items-center gap-2 group h-full justify-end">
-                <div className="flex items-end gap-1.5 w-full justify-center h-[90%]">
-                  {/* Scans bar */}
-                  <div 
-                    className="w-3.5 bg-slate-100 dark:bg-slate-800 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 rounded-t-md transition-all duration-200 relative"
-                    style={{ height: `${col.scans}%` }}
-                  >
-                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] bg-slate-900 text-white rounded px-1.5 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 shadow-sm font-semibold">
-                      Scans: {col.scans}
-                    </span>
+            {(() => {
+              const maxVal = Math.max(...(stats.daily_calls || []).map((d: any) => d.value), 5);
+              return (stats.daily_calls || []).map((col: any, idx: number) => {
+                const heightPercent = (col.value / maxVal) * 85;
+                return (
+                  <div key={idx} className="flex-1 flex flex-col items-center gap-2 group h-full justify-end">
+                    <div className="flex items-end gap-1.5 w-full justify-center h-[90%]">
+                      {/* Calls bar */}
+                      <div 
+                        className="w-5 bg-primary-500 rounded-t-md group-hover:bg-primary-600 transition-all duration-200 relative"
+                        style={{ height: `${Math.max(heightPercent, 4)}%` }}
+                      >
+                        <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] bg-slate-900 text-white rounded px-1.5 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 shadow-sm font-semibold">
+                          Calls: {col.value}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-semibold select-none">{col.label}</span>
                   </div>
-                  {/* Calls bar */}
-                  <div 
-                    className="w-3.5 bg-primary-500 rounded-t-md group-hover:bg-primary-600 transition-all duration-200 relative"
-                    style={{ height: `${col.calls}%` }}
-                  >
-                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] bg-slate-900 text-white rounded px-1.5 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 shadow-sm font-semibold">
-                      Calls: {col.calls}
-                    </span>
-                  </div>
-                </div>
-                <span className="text-[10px] text-slate-400 font-semibold select-none">{col.hr}</span>
-              </div>
-            ))}
+                );
+              });
+            })()}
           </div>
 
           <div className="flex gap-4 mt-4 text-[11px] font-semibold text-slate-400">
             <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded bg-slate-200 dark:bg-slate-800"></span>
-              <span>RFID Scans</span>
-            </div>
-            <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded bg-primary-500"></span>
-              <span>Successful Calls</span>
+              <span>Total Voice Calls</span>
             </div>
           </div>
         </div>
