@@ -73,6 +73,12 @@ export const Users: React.FC = () => {
       is_active: formIsActive
     };
 
+    // Assign school context for Super Admin creating school-specific accounts
+    const tokenSchoolId = localStorage.getItem("spcs_selected_school_id");
+    if (user?.role === "Super Admin" && tokenSchoolId) {
+      payload.school_id = parseInt(tokenSchoolId);
+    }
+
     if (formPassword) {
       payload.password = formPassword;
     }
@@ -124,13 +130,13 @@ export const Users: React.FC = () => {
           <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold">Assign console privileges to teachers, operators and school admins.</p>
         </div>
 
-        {user?.role === "Super Admin" && (
+        {(user?.role === "Super Admin" || user?.role === "School Admin") && (
           <button
             onClick={openCreateModal}
             className="btn-primary text-[11px] py-1.5 px-3.5 flex items-center gap-1.5 shadow-md cursor-pointer"
           >
             <Plus size={12} />
-            <span>Add Administrator</span>
+            <span>Add Operator</span>
           </button>
         )}
       </div>
@@ -155,7 +161,7 @@ export const Users: React.FC = () => {
                     }`}>
                       {u.role?.name || "User"}
                     </span>
-                    {user?.role === "Super Admin" && (
+                    {(user?.role === "Super Admin" || user?.role === "School Admin") && (
                       <div className="flex gap-1.5">
                         <button
                           onClick={() => openEditModal(u)}
@@ -253,7 +259,7 @@ export const Users: React.FC = () => {
                   disabled={selectedUser?.email === user?.email}
                   className="premium-input text-xs py-2 cursor-pointer bg-white dark:bg-slate-900 disabled:opacity-60"
                 >
-                  <option value="1">Super Admin</option>
+                  {user?.role === "Super Admin" && <option value="1">Super Admin</option>}
                   <option value="2">School Admin</option>
                   <option value="3">Teacher</option>
                 </select>
