@@ -101,7 +101,10 @@
 .premium-input {
   display: block;
   width: 100%;
-  padding: 0.625rem 0.875rem;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+  padding-left: 0.875rem;
+  padding-right: 0.875rem;
   background-color: #ffffff;
   border: 1px solid #E5E7EB;
   border-radius: 10px;
