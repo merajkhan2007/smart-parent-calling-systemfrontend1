@@ -222,7 +222,7 @@ export const RfidCards: React.FC = () => {
                           <div className="font-bold text-slate-800 dark:text-slate-200">{c.student_name}</div>
                           <span className="text-[10px] text-slate-400 dark:text-slate-500">Adm: {c.student_admission_number}</span>
                         </td>
-                        <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400 font-semibold">{formatDate(c.created_at)}</td>
+                        <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400 font-semibold">{formatDate(c.assigned_at)}</td>
                         <td className="px-5 py-3.5">
                           <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase ${
                             c.status === "active" ? "bg-success-50 text-success-600 border border-success-100/50 dark:bg-success-950/20 dark:text-success-400" : "bg-danger-50 text-danger-600 border border-danger-100/50 dark:bg-danger-950/20 dark:text-danger-400"
