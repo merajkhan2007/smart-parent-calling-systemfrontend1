@@ -65,7 +65,6 @@ export const Dashboard: React.FC = () => {
       const callData = await apiFetch("/api/call/?limit=5"); // latest calls
       const studentsData = await apiFetch("/api/students/?limit=1"); // total students
       
-      
       // Parse scans for timeline
       const timelineScans = (dbStats || []).map((s: any) => {
         const utcStr = s.timestamp && !s.timestamp.endsWith("Z") ? `${s.timestamp}Z` : s.timestamp;
@@ -182,25 +181,25 @@ export const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Top dashboard summary header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Main Dashboard</h1>
-          <p className="text-xs text-slate-400 font-semibold">Smart calling gate and live RFID diagnostic center.</p>
+          <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Oakridge Calling Console</h1>
+          <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold">Smart calling gate and live RFID diagnostic center.</p>
         </div>
         
         <div className="flex gap-2">
           <button 
             onClick={fetchDashboardData}
-            className="flex items-center gap-2 px-3 py-1.5 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-800 shadow-2xs transition-colors cursor-pointer"
+            className="btn-secondary text-[11px] py-1.5 px-3 flex items-center gap-1.5"
           >
             <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
             <span>Refresh State</span>
           </button>
           <Link
             to="/students"
-            className="flex items-center gap-2 px-3 py-1.5 bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold rounded-lg shadow-sm shadow-primary-500/10 transition-colors cursor-pointer"
+            className="btn-primary text-[11px] py-1.5 px-3 flex items-center gap-1.5"
           >
             <UserPlus size={12} />
             <span>Add Student</span>
@@ -237,7 +236,7 @@ export const Dashboard: React.FC = () => {
           title="Call Duration Today"
           value={`${Math.round(stats.call_duration_today / 60)} min`}
           icon={Clock}
-          color="bg-amber-500"
+          color="bg-warning-500"
           loading={loading}
         />
       </div>
@@ -248,7 +247,7 @@ export const Dashboard: React.FC = () => {
           title="RFID Scans Today"
           value={stats.rfid_scans_today}
           icon={Scan}
-          color="bg-indigo-500"
+          color="bg-primary-500"
           loading={loading}
         />
         <StatCard
@@ -262,14 +261,14 @@ export const Dashboard: React.FC = () => {
           title="Offline Devices"
           value={stats.offline_devices}
           icon={Cpu}
-          color="bg-rose-500"
+          color="bg-danger-500"
           loading={loading}
         />
         <StatCard
           title="Rejected Calls"
           value={stats.rejected_calls}
           icon={XCircle}
-          color="bg-rose-500"
+          color="bg-danger-500"
           loading={loading}
         />
       </div>
@@ -277,43 +276,51 @@ export const Dashboard: React.FC = () => {
       {/* Graph and Timeline */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Custom drawn high-end SVG Chart Widget */}
-        <div className="lg:col-span-2 saas-card bg-white dark:bg-slate-900 p-6 rounded-[24px] border border-slate-200/80 dark:border-slate-800/80 flex flex-col justify-between min-h-[350px]">
+        <div className="lg:col-span-2 saas-card bg-white dark:bg-slate-900 p-6 flex flex-col justify-between min-h-[350px] relative">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h3 className="text-sm font-bold tracking-tight text-slate-800 dark:text-slate-100">Weekly Call Trends</h3>
-              <p className="text-xs text-slate-400">Daily calling traffic volume (last 7 days)</p>
+              <h3 className="text-xs font-bold tracking-tight text-slate-800 dark:text-slate-100 uppercase">Weekly Call Trends</h3>
+              <p className="text-2xs text-slate-400 dark:text-slate-500 font-semibold">Daily calling traffic volume (last 7 days)</p>
             </div>
-            <span className="text-[9px] uppercase font-bold text-slate-400 px-2 py-0.5 bg-slate-50 dark:bg-slate-850 rounded-md">
+            <span className="text-[9px] uppercase font-bold text-slate-400 dark:text-slate-500 px-2 py-0.5 bg-slate-50 dark:bg-slate-800 rounded-md">
               Live Feed
             </span>
           </div>
 
-          <div className="flex-1 flex items-end justify-between h-48 gap-3 pt-6 border-b border-slate-100 dark:border-slate-800">
+          <div className="relative flex-grow flex items-end justify-between h-48 gap-3 pt-6 border-b border-slate-100 dark:border-slate-850">
+            {/* Grid lines */}
+            <div className="absolute inset-x-0 top-0 h-full flex flex-col justify-between pointer-events-none opacity-40">
+              <div className="border-t border-dashed border-slate-200 dark:border-slate-800 w-full h-0"></div>
+              <div className="border-t border-dashed border-slate-200 dark:border-slate-800 w-full h-0"></div>
+              <div className="border-t border-dashed border-slate-200 dark:border-slate-800 w-full h-0"></div>
+              <div className="border-t border-dashed border-slate-200 dark:border-slate-800 w-full h-0"></div>
+            </div>
+            
             {(() => {
               const maxVal = Math.max(...(stats.daily_calls || []).map((d: any) => d.value), 5);
               return (stats.daily_calls || []).map((col: any, idx: number) => {
                 const heightPercent = (col.value / maxVal) * 85;
                 return (
-                  <div key={idx} className="flex-1 flex flex-col items-center gap-2 group h-full justify-end">
+                  <div key={idx} className="flex-1 flex flex-col items-center gap-2 group h-full justify-end z-10">
                     <div className="flex items-end gap-1.5 w-full justify-center h-[90%]">
                       {/* Calls bar */}
                       <div 
-                        className="w-5 bg-primary-500 rounded-t-md group-hover:bg-primary-600 transition-all duration-200 relative"
+                        className="w-5 bg-gradient-to-t from-primary-500 to-primary-600 rounded-t-[4px] group-hover:from-accent-500 group-hover:to-accent-600 transition-all duration-200 relative"
                         style={{ height: `${Math.max(heightPercent, 4)}%` }}
                       >
-                        <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] bg-slate-900 text-white rounded px-1.5 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 shadow-sm font-semibold">
+                        <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] bg-slate-900 text-white rounded-md px-1.5 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 shadow-md font-bold">
                           Calls: {col.value}
                         </span>
                       </div>
                     </div>
-                    <span className="text-[10px] text-slate-400 font-semibold select-none">{col.label}</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold select-none">{col.label}</span>
                   </div>
                 );
               });
             })()}
           </div>
 
-          <div className="flex gap-4 mt-4 text-[11px] font-semibold text-slate-400">
+          <div className="flex gap-4 mt-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded bg-primary-500"></span>
               <span>Total Voice Calls</span>

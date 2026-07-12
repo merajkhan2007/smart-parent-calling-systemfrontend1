@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import { School, Upload, FileImage, ShieldCheck } from "lucide-react";
+import { School, Upload, FileImage } from "lucide-react";
 
 export const SchoolProfile: React.FC = () => {
   const { apiFetch } = useAuth();
@@ -63,49 +63,49 @@ export const SchoolProfile: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 font-sans">
+    <div className="space-y-6 font-sans animate-fade-in">
       <div>
-        <h1 className="text-2xl font-extrabold tracking-tight">School Branding Profile</h1>
-        <p className="text-sm text-slate-400 font-semibold">Customize school meta details and dials default banners.</p>
+        <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">School Branding Profile</h1>
+        <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold">Customize school meta details and dials default banners.</p>
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-slate-400 font-semibold text-sm">Loading profile...</div>
+        <div className="text-center py-12 text-slate-400 font-bold text-xs uppercase tracking-wider animate-pulse">Loading profile...</div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Card profile summary */}
-          <div className="rounded-3xl glass p-6 border dark:bg-slate-900/40 text-center relative overflow-hidden flex flex-col items-center justify-center">
-            <div className="w-20 h-20 rounded-3xl bg-indigo-50 dark:bg-indigo-950/20 text-indigo-500 flex items-center justify-center mb-4 border border-indigo-100 shadow-sm shrink-0">
+          <div className="saas-card bg-white dark:bg-slate-900 p-6 text-center relative overflow-hidden flex flex-col items-center justify-center">
+            <div className="w-20 h-20 rounded-2xl bg-primary-50 dark:bg-primary-950/20 text-primary-500 flex items-center justify-center mb-4 border border-primary-100/50 dark:border-primary-900/30 shadow-xs shrink-0">
               <School size={36} />
             </div>
             
-            <h3 className="font-extrabold text-base">{schoolName}</h3>
-            <p className="text-xs text-slate-400 font-bold uppercase mt-1">SPCS Dial-in Node</p>
+            <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200">{schoolName}</h3>
+            <p className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase mt-1">SPCS Dial-in Node</p>
             
-            <div className="w-full mt-6 pt-6 border-t border-slate-100/50 dark:border-slate-800/50 text-left text-xs space-y-3">
-              <div className="flex justify-between items-center text-slate-400 font-bold">
+            <div className="w-full mt-6 pt-6 border-t border-slate-100 dark:border-slate-800/80 text-left text-xs space-y-3">
+              <div className="flex justify-between items-center text-slate-400 dark:text-slate-500 font-semibold">
                 <span>Direct Contact</span>
-                <span className="text-slate-700 dark:text-slate-300 font-extrabold">{contact}</span>
+                <span className="text-slate-700 dark:text-slate-350 font-bold">{contact}</span>
               </div>
-              <div className="flex justify-between items-center text-slate-400 font-bold">
+              <div className="flex justify-between items-center text-slate-400 dark:text-slate-500 font-semibold">
                 <span>Address</span>
-                <span className="text-slate-750 dark:text-slate-300 truncate max-w-[150px]">{address}</span>
+                <span className="text-slate-700 dark:text-slate-300 font-bold truncate max-w-[150px]">{address}</span>
               </div>
             </div>
           </div>
 
           {/* Logo brand custom upload */}
-          <div className="lg:col-span-2 rounded-3xl glass p-6 border dark:bg-slate-900/40">
-            <div className="flex items-center gap-2.5 pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
-              <FileImage size={18} className="text-primary-600" />
-              <h3 className="font-extrabold text-sm">Brand Customizations & Logos</h3>
+          <div className="lg:col-span-2 saas-card bg-white dark:bg-slate-900 p-6">
+            <div className="flex items-center gap-2.5 pb-4 border-b border-slate-100 dark:border-slate-800/80 mb-6">
+              <FileImage size={18} className="text-primary-500" />
+              <h3 className="font-bold text-xs uppercase text-slate-850 dark:text-slate-200">Brand Customizations & Logos</h3>
             </div>
 
             <form onSubmit={handleLogoUpload} className="space-y-4">
-              <div className="border-2 border-dashed border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 text-center">
+              <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-6 text-center">
                 <FileImage className="mx-auto text-primary-500 mb-3" size={32} />
-                <label className="block text-xs font-bold text-slate-500 mb-2 cursor-pointer">
-                  <span>Upload Logo (PNG, JPG, SVG)</span>
+                <label className="block text-xs font-semibold text-slate-550 dark:text-slate-400 mb-2 cursor-pointer">
+                  <span className="hover:text-primary-500 transition-colors">Upload Logo (PNG, JPG, SVG)</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -114,14 +114,14 @@ export const SchoolProfile: React.FC = () => {
                   />
                 </label>
                 {logoFile && (
-                  <p className="text-xs font-bold text-indigo-600 mt-2">{logoFile.name}</p>
+                  <p className="text-xs font-bold text-primary-600 mt-2">{logoFile.name}</p>
                 )}
               </div>
 
               <button
                 type="submit"
                 disabled={!logoFile}
-                className="w-full py-2.5 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-650 disabled:opacity-50 text-white font-bold text-xs uppercase rounded-xl shadow-md transition-all"
+                className="w-full btn-primary py-2.5 text-xs font-bold uppercase tracking-wider disabled:opacity-50 cursor-pointer shadow-md"
               >
                 Save Branding Assets
               </button>

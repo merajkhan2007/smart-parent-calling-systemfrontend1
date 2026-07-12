@@ -80,24 +80,24 @@ export const CallHistory: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 font-sans">
+    <div className="space-y-6 font-sans animate-fade-in">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Call Log Transcripts</h1>
-          <p className="text-xs text-slate-400 font-semibold">View chronological logs of all calls routed through LTE modules.</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold">View chronological logs of all calls routed through LTE modules.</p>
         </div>
 
         <div className="flex gap-2">
           <button
             onClick={() => handleExport("/api/call/export/pdf", "call_history_report.csv")}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+            className="btn-secondary text-[11px] py-1.5 px-3 flex items-center gap-1.5 cursor-pointer"
           >
             <Download size={12} />
             <span>Download CSV</span>
           </button>
           <button
             onClick={() => handleExport("/api/call/export/excel", "call_history.xlsx")}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+            className="btn-secondary text-[11px] py-1.5 px-3 flex items-center gap-1.5 cursor-pointer"
           >
             <FileSpreadsheet size={12} />
             <span>Download Excel</span>
@@ -106,7 +106,7 @@ export const CallHistory: React.FC = () => {
       </div>
 
       {/* Filter panel */}
-      <div className="saas-card bg-white dark:bg-slate-900 p-5 rounded-[24px] border border-slate-200/80 dark:border-slate-800/80">
+      <div className="saas-card bg-white dark:bg-slate-900 p-5">
         <form onSubmit={handleFilterSubmit} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="relative">
             <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -117,14 +117,14 @@ export const CallHistory: React.FC = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search Student..."
-              className="block w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs placeholder-slate-400 focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/5 transition-all font-medium"
+              className="premium-input pl-9 text-xs py-2"
             />
           </div>
           <div>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs focus:outline-none font-medium"
+              className="premium-input text-xs py-2 cursor-pointer bg-white dark:bg-slate-900"
             >
               <option value="">All Call States</option>
               <option value="completed">Completed</option>
@@ -134,7 +134,7 @@ export const CallHistory: React.FC = () => {
           </div>
           <button
             type="submit"
-            className="w-full py-2 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-650 text-white font-semibold text-xs rounded-lg transition-colors cursor-pointer"
+            className="btn-primary text-xs py-2 w-full font-bold uppercase tracking-wider cursor-pointer"
           >
             Filter Logs
           </button>
@@ -142,11 +142,11 @@ export const CallHistory: React.FC = () => {
       </div>
 
       {/* Logs Table */}
-      <div className="saas-card bg-white dark:bg-slate-900 rounded-[24px] border border-slate-200/80 dark:border-slate-800/80 overflow-hidden">
+      <div className="saas-card bg-white dark:bg-slate-900 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50/70 dark:bg-slate-850/50 border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-wider">
+              <tr className="bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-200/50 dark:border-slate-800/80 text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-wider">
                 <th className="px-6 py-3.5">Call ID</th>
                 <th className="px-6 py-3.5">Student</th>
                 <th className="px-6 py-3.5">Parent Called</th>
@@ -160,34 +160,34 @@ export const CallHistory: React.FC = () => {
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
               {loading ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-8 text-center text-slate-400">Loading call history...</td>
+                  <td colSpan={8} className="px-6 py-8 text-center text-slate-400 font-bold uppercase tracking-wider animate-pulse">Loading call history...</td>
                 </tr>
               ) : calls.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-8 text-center text-slate-400">No call history logs found.</td>
+                  <td colSpan={8} className="px-6 py-8 text-center text-slate-400 font-bold">No call history logs found.</td>
                 </tr>
               ) : (
                 calls.map((c) => (
-                  <tr key={c.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-850/20 transition-colors">
-                    <td className="px-6 py-3.5 font-semibold text-slate-400">#{c.id}</td>
+                  <tr key={c.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/25 transition-colors">
+                    <td className="px-6 py-3.5 font-bold text-slate-400">#{c.id}</td>
                     <td className="px-6 py-3.5">
                       <span className="font-bold text-slate-800 dark:text-slate-200 text-sm">{c.student?.name}</span>
                     </td>
                     <td className="px-6 py-3.5 font-semibold text-slate-500 dark:text-slate-400 capitalize">{c.parent_type}</td>
-                    <td className="px-6 py-3.5 font-semibold text-primary-500 dark:text-primary-400">
-                      <div className="flex items-center gap-1">
+                    <td className="px-6 py-3.5 font-bold text-primary-500 dark:text-primary-400">
+                      <div className="flex items-center gap-1.5">
                         <Phone size={10} />
                         <span>{c.phone_number}</span>
                       </div>
                     </td>
                     <td className="px-6 py-3.5 font-bold text-slate-500 dark:text-slate-400">{c.device?.name || "Gate A Entrance"}</td>
-                    <td className="px-6 py-3.5 text-slate-400 font-semibold">{formatDateTime(c.call_start)}</td>
-                    <td className="px-6 py-3.5 font-semibold text-slate-600 dark:text-slate-350">{formatDuration(c.duration)}</td>
+                    <td className="px-6 py-3.5 text-slate-400 dark:text-slate-500 font-semibold">{formatDateTime(c.call_start)}</td>
+                    <td className="px-6 py-3.5 font-bold text-slate-650 dark:text-slate-350">{formatDuration(c.duration)}</td>
                     <td className="px-6 py-3.5">
                       <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase inline-flex items-center gap-1 border ${
                         c.status === "completed" 
-                          ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400" 
-                          : "bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-950/20 dark:text-rose-400"
+                          ? "bg-primary-50 text-primary-600 border-primary-100/40 dark:bg-primary-950/20 dark:text-primary-400" 
+                          : "bg-danger-50 text-danger-600 border-danger-100/45 dark:bg-danger-950/20 dark:text-danger-400"
                       }`}>
                         {c.status === "completed" ? <CheckCircle size={10} /> : <XCircle size={10} />}
                         <span>{c.status}</span>

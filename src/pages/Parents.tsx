@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import { Search, UserCheck, Shield, Phone, HelpCircle } from "lucide-react";
+import { Search, UserCheck, Shield, Phone } from "lucide-react";
 
 export const Parents: React.FC = () => {
   const { apiFetch } = useAuth();
@@ -38,30 +38,30 @@ export const Parents: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-extrabold tracking-tight">Parent Profiles</h1>
-        <p className="text-sm text-slate-400 font-semibold">Manage family relationships and dialer configurations.</p>
+        <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Parent Profiles</h1>
+        <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold">Manage family relationships and dialer configurations.</p>
       </div>
 
       {/* Search Filter */}
-      <div className="rounded-2xl glass p-5 dark:bg-slate-900/40">
+      <div className="saas-card p-5">
         <form onSubmit={handleSearchSubmit} className="flex gap-4">
           <div className="relative flex-1">
             <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-              <Search size={16} />
+              <Search size={14} />
             </span>
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search father, mother name or phone..."
-              className="block w-full pl-10 pr-3 py-2.5 bg-white/50 dark:bg-slate-850/60 border border-slate-200/60 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+              className="premium-input pl-9 text-xs py-2.5"
             />
           </div>
           <button
             type="submit"
-            className="px-6 py-2.5 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-650 text-white font-bold text-sm rounded-xl transition-all"
+            className="btn-primary text-xs py-2 px-5 font-bold uppercase tracking-wider"
           >
             Search Contacts
           </button>
@@ -70,62 +70,64 @@ export const Parents: React.FC = () => {
 
       {/* Grid of Profiles */}
       {loading ? (
-        <div className="text-center py-12 text-slate-400 font-semibold text-sm">Loading parent directory...</div>
+        <div className="text-center py-12 text-slate-400 font-bold text-xs uppercase tracking-wider animate-pulse">Loading parent directory...</div>
       ) : parents.length === 0 ? (
-        <div className="text-center py-12 text-slate-400 font-semibold text-sm">No parents profiles found.</div>
+        <div className="text-center py-12 text-slate-450 font-semibold text-xs">No parent profiles found.</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {parents.map((p) => (
-            <div key={p.id} className="rounded-3xl glass p-6 border dark:bg-slate-900/40 relative overflow-hidden shadow-sm">
-              <div className="flex items-center gap-3 pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
-                <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 flex items-center justify-center shadow-sm">
-                  <UserCheck size={20} />
+            <div key={p.id} className="saas-card bg-white dark:bg-slate-900 p-6 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-3 pb-4 mb-4 border-b border-slate-100 dark:border-slate-800/80">
+                  <div className="w-9 h-9 rounded-xl bg-primary-50 text-primary-500 dark:bg-primary-950/20 dark:text-primary-400 flex items-center justify-center border border-primary-100/50 dark:border-primary-900/30">
+                    <UserCheck size={18} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-xs text-slate-800 dark:text-slate-200">Family Profile #{p.id}</h3>
+                    <span className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Primary Contacts</span>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-extrabold text-sm text-slate-700 dark:text-slate-200">Family Profile #{p.id}</h3>
-                  <span className="text-[10px] text-slate-400 font-semibold uppercase">Primary Contacts</span>
+
+                <div className="space-y-3.5 text-xs">
+                  {/* Father */}
+                  <div className="flex justify-between items-start gap-4">
+                    <div>
+                      <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Father</span>
+                      <p className="font-bold text-xs text-slate-700 dark:text-slate-350">{p.father_name || "N/A"}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Mobile</span>
+                      <p className="font-bold text-xs text-primary-500 hover:text-primary-600 flex items-center gap-1.5 justify-end">
+                        <Phone size={10} />
+                        <span>{p.father_mobile || "N/A"}</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Mother */}
+                  <div className="flex justify-between items-start gap-4">
+                    <div>
+                      <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Mother</span>
+                      <p className="font-bold text-xs text-slate-700 dark:text-slate-350">{p.mother_name || "N/A"}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Mobile</span>
+                      <p className="font-bold text-xs text-primary-500 hover:text-primary-600 flex items-center gap-1.5 justify-end">
+                        <Phone size={10} />
+                        <span>{p.mother_mobile || "N/A"}</span>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-3.5 text-xs">
-                {/* Father */}
-                <div className="flex justify-between items-start gap-4">
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase">Father</span>
-                    <p className="font-bold text-sm text-slate-700 dark:text-slate-300">{p.father_name || "N/A"}</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase">Mobile</span>
-                    <p className="font-semibold text-primary-600 dark:text-primary-400 flex items-center gap-1">
-                      <Phone size={10} />
-                      <span>{p.father_mobile || "N/A"}</span>
-                    </p>
-                  </div>
-                </div>
-
-                {/* Mother */}
-                <div className="flex justify-between items-start gap-4">
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase">Mother</span>
-                    <p className="font-bold text-sm text-slate-700 dark:text-slate-300">{p.mother_name || "N/A"}</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase">Mobile</span>
-                    <p className="font-semibold text-primary-600 dark:text-primary-400 flex items-center gap-1">
-                      <Phone size={10} />
-                      <span>{p.mother_mobile || "N/A"}</span>
-                    </p>
-                  </div>
-                </div>
-
-                {/* Emergency Contact */}
-                <div className="flex justify-between items-center pt-3 border-t border-slate-100 dark:border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1">
-                    <Shield size={10} className="text-rose-500" />
-                    <span>Emergency Contact</span>
-                  </span>
-                  <span className="font-bold text-slate-600 dark:text-slate-300">{p.emergency_contact || p.father_mobile}</span>
-                </div>
+              {/* Emergency Contact */}
+              <div className="flex justify-between items-center pt-3 mt-4 border-t border-slate-100 dark:border-slate-800/80 text-xs">
+                <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase flex items-center gap-1">
+                  <Shield size={10} className="text-danger-500" />
+                  <span>Emergency Line</span>
+                </span>
+                <span className="font-bold text-slate-650 dark:text-slate-300">{p.emergency_contact || p.father_mobile}</span>
               </div>
             </div>
           ))}

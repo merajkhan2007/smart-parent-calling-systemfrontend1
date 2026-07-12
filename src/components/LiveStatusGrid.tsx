@@ -35,28 +35,35 @@ export const LiveStatusGrid: React.FC<LiveStatusGridProps> = ({ devices, onResta
   const getStatusColor = (msg: string) => {
     const formatted = msg?.toLowerCase();
     if (formatted === "calling") {
-      return "bg-amber-50 text-amber-600 border border-amber-100 dark:bg-amber-950/20 dark:border-amber-900/30 dark:text-amber-400";
+      return "bg-warning-55 bg-amber-50 text-warning-600 border border-warning-100/50 dark:bg-warning-950/20 dark:border-warning-900/30 dark:text-warning-450";
     }
     if (formatted === "connected") {
-      return "bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-950/20 dark:border-emerald-900/30 dark:text-emerald-400 animate-pulse";
+      return "bg-success-50 text-success-600 border border-success-100/50 dark:bg-success-950/20 dark:border-success-900/30 dark:text-success-400 animate-pulse";
     }
     if (formatted === "card scanned") {
-      return "bg-indigo-50 text-indigo-600 border border-indigo-100 dark:bg-indigo-950/20 dark:border-indigo-900/30 dark:text-indigo-400";
+      return "bg-primary-50 text-primary-600 border border-primary-100/50 dark:bg-primary-950/20 dark:border-primary-900/30 dark:text-primary-400";
     }
     if (formatted === "call ended") {
-      return "bg-slate-50 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400";
+      return "bg-slate-50 text-slate-500 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400";
     }
     if (formatted === "rfid waiting") {
-      return "bg-primary-50 text-primary-500 border border-primary-100 dark:bg-primary-950/20 dark:border-primary-900/30 dark:text-primary-400";
+      return "bg-primary-50 text-primary-500 border border-primary-100/50 dark:bg-primary-950/20 dark:border-primary-900/30 dark:text-primary-400";
     }
-    return "bg-rose-50 text-rose-600 border border-rose-100 dark:bg-rose-950/20 dark:border-rose-900/30 dark:text-rose-400";
+    return "bg-danger-50 text-danger-600 border border-danger-100/50 dark:bg-danger-950/20 dark:border-danger-900/30 dark:text-danger-400";
+  };
+
+  const getWifiIcon = (signal?: number) => {
+    if (!signal) return <Wifi size={12} className="text-slate-300" />;
+    if (signal > -50) return <Wifi size={12} className="text-success-500" />;
+    if (signal > -70) return <Wifi size={12} className="text-primary-500" />;
+    return <Wifi size={12} className="text-warning-500" />;
   };
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 tracking-tight">Live Device Status</h3>
-        <span className="text-[9px] uppercase font-bold text-slate-400 px-3 py-1 bg-slate-50 dark:bg-slate-800/80 rounded-md">
+        <h3 className="text-xs font-bold text-slate-850 dark:text-slate-100 tracking-tight uppercase">Live Hardware Status</h3>
+        <span className="text-[9px] uppercase font-bold text-slate-400 dark:text-slate-500 px-3 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md">
           Live Gateway Connections
         </span>
       </div>
@@ -70,18 +77,18 @@ export const LiveStatusGrid: React.FC<LiveStatusGridProps> = ({ devices, onResta
           {devices.map((dev) => (
             <div
               key={dev.id}
-              className={`saas-card bg-white dark:bg-slate-900 p-5 rounded-[24px] border border-slate-200/80 dark:border-slate-800/80 relative overflow-hidden transition-all duration-200 ${
+              className={`saas-card bg-white dark:bg-slate-900 p-5 transition-all duration-200 ${
                 dev.status === "offline" ? "opacity-75" : ""
               }`}
             >
               <div className="flex items-start justify-between gap-2 mb-4">
                 <div className="flex items-center gap-2.5">
-                  <div className={`p-2 rounded-xl border ${dev.status === "online" ? "bg-primary-50 text-primary-500 border-primary-100 dark:bg-primary-950/30 dark:border-primary-900/30" : "bg-slate-50 text-slate-400 border-slate-100 dark:bg-slate-800 dark:border-slate-700"}`}>
+                  <div className={`p-2 rounded-xl border ${dev.status === "online" ? "bg-primary-50 text-primary-500 border-primary-100 dark:bg-primary-950/20 dark:border-primary-900/30" : "bg-slate-50 text-slate-400 border-slate-100 dark:bg-slate-800 dark:border-slate-700"}`}>
                     <Cpu size={16} />
                   </div>
                   <div>
                     <h4 className="font-bold text-xs text-slate-800 dark:text-slate-200 truncate max-w-[120px]">{dev.name}</h4>
-                    <p className="text-[10px] text-slate-400 font-semibold">{dev.classroom || "No classroom"}</p>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold">{dev.classroom || "No classroom"}</p>
                   </div>
                 </div>
 
@@ -91,27 +98,27 @@ export const LiveStatusGrid: React.FC<LiveStatusGridProps> = ({ devices, onResta
               </div>
 
               {/* Hardware diagnostics metrics */}
-              <div className="grid grid-cols-3 gap-2 py-3 border-y border-slate-100 dark:border-slate-800 mb-3 text-[10px] text-slate-400 font-semibold">
-                <div className="flex items-center gap-1">
-                  <Wifi size={12} className="text-slate-400" />
-                  <span>{dev.wifi_signal ? `${dev.wifi_signal} dBm` : "No WiFi"}</span>
+              <div className="grid grid-cols-3 gap-2 py-3 border-y border-slate-100 dark:border-slate-800/80 mb-3 text-[10px] text-slate-450 dark:text-slate-500 font-semibold">
+                <div className="flex items-center gap-1.5">
+                  {getWifiIcon(dev.wifi_signal)}
+                  <span className="text-slate-650 dark:text-slate-350">{dev.wifi_signal ? `${dev.wifi_signal} dBm` : "No WiFi"}</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Battery size={12} className="text-slate-400" />
-                  <span>{dev.battery_status !== undefined ? `${dev.battery_status}%` : "No Batt"}</span>
+                <div className="flex items-center gap-1.5">
+                  <Battery size={12} className={dev.battery_status && dev.battery_status < 20 ? "text-danger-500" : "text-slate-400"} />
+                  <span className="text-slate-650 dark:text-slate-350">{dev.battery_status !== undefined ? `${dev.battery_status}%` : "No Batt"}</span>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   <Signal size={12} className="text-slate-400" />
-                  <span className="truncate">{dev.sim_network || "No LTE"}</span>
+                  <span className="truncate text-slate-650 dark:text-slate-350">{dev.sim_network || "No LTE"}</span>
                 </div>
               </div>
 
               <div className="flex items-center justify-between gap-4 mt-2">
-                <span className="text-[9px] text-slate-400 font-semibold truncate">MAC: {dev.mac_address || "N/A"}</span>
+                <span className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold truncate">MAC: {dev.mac_address || "N/A"}</span>
                 {dev.status === "online" && (
                   <button
                     onClick={() => onRestart(dev.device_id)}
-                    className="flex items-center gap-1.5 px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-200 dark:border-slate-750 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-600 dark:text-slate-300 font-semibold text-2xs rounded-lg transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-200 dark:border-slate-750 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-650 dark:text-slate-300 font-semibold text-[10px] rounded-lg transition-colors cursor-pointer"
                   >
                     <RefreshCw size={10} />
                     <span>Restart</span>

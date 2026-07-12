@@ -1,98 +1,232 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary-50: #f0f0fe;
-  --color-primary-100: #e2e2fd;
-  --color-primary-200: #c9c9fb;
-  --color-primary-300: #a3a4f8;
-  --color-primary-400: #7879f3;
-  --color-primary-500: #5B5CEB;
-  --color-primary-600: #494ad6;
-  --color-primary-700: #3c3cb4;
-  --color-primary-800: #323294;
-  --color-primary-900: #2c2c77;
+  /* Color Palette */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #2563EB; /* Modern Blue */
+  --color-primary-600: #1d4ed8;
+  --color-primary-700: #1e40af;
+  --color-primary-800: #1e3a8a;
+  --color-primary-900: #172554;
 
-  --color-success-500: #10B981;
-  --color-warning-500: #F59E0B;
-  --color-danger-500: #EF4444;
+  --color-accent-50: #fff7ed;
+  --color-accent-100: #ffedd5;
+  --color-accent-200: #fed7aa;
+  --color-accent-300: #fdba74;
+  --color-accent-400: #fb923c;
+  --color-accent-500: #F97316; /* Orange */
+  --color-accent-600: #ea580c;
+  --color-accent-700: #c2410c;
+  --color-accent-800: #9a3412;
+  --color-accent-900: #7c2d12;
 
-  --color-bg-base: #F8FAFC;
+  --color-text-main: #111827; /* Dark Slate Text */
+  --color-text-secondary: #6B7280; /* Muted text */
+  --color-bg-base: #F8FAFC; /* Light gray background */
   --color-surface: #FFFFFF;
   --color-border-base: #E5E7EB;
-  --color-text-main: #0F172A;
+
+  --color-success-50: #f0fdf4;
+  --color-success-100: #dcfce7;
+  --color-success-500: #22C55E;
+  --color-success-600: #16a34a;
+
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-500: #F59E0B;
+  --color-warning-600: #d97706;
+
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+  --color-danger-500: #EF4444;
+  --color-danger-600: #dc2626;
+
+  /* Custom timings */
+  --animate-shimmer: shimmer 2s infinite linear;
+  --animate-fade-in: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-in: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-up: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @layer base {
   body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--color-text-main);
+    background-color: var(--color-bg-base);
   }
 }
 
-/* Premium SaaS Cards & Panel Surfaces with 24px (rounded-3xl) radius */
+/* Premium Enterprise SaaS Cards - Rounded corners (16px / rounded-2xl) */
 .saas-card {
   background: #ffffff;
-  border: 1px solid #e5e7eb; /* border-slate-200 */
-  border-radius: 24px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.dark .saas-card {
-  background: #0f172a; /* slate-900 */
-  border: 1px solid #1e293b; /* slate-800 */
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+  border: 1px solid #E5E7EB;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .saas-card:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.04), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+}
+
+.dark .saas-card {
+  background: #111827; /* slate-900 */
+  border-color: #1f2937; /* slate-800 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .dark .saas-card:hover {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
 }
 
-/* Retrofit legacy .glass helper class for compatibility */
+/* Retrofit legacy glass support */
 .glass {
   background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 24px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid #E5E7EB;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
 }
 
 .dark .glass {
-  background: #0f172a;
-  border: 1px solid #1e293b;
+  background: #111827;
+  border-color: #1f2937;
 }
 
-/* Premium SaaS Inputs (Linear & Stripe inspired) */
-.saas-input {
+/* Form Inputs with Modern Clean Border Styling */
+.premium-input {
+  display: block;
+  width: 100%;
+  padding: 0.625rem 0.875rem;
   background-color: #ffffff;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #E5E7EB;
   border-radius: 10px;
-  color: #0f172a;
+  color: #111827;
   font-size: 0.875rem;
-  transition: all 0.2s ease-in-out;
-  padding: 0.75rem 1rem;
+  font-weight: 500;
+  transition: all 0.15s ease-in-out;
 }
 
-.saas-input:focus {
-  border-color: #5B5CEB;
+.premium-input:focus {
+  border-color: #2563EB;
   outline: none;
-  box-shadow: 0 0 0 4px rgba(91, 92, 235, 0.12);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
 }
 
-.dark .saas-input {
-  background-color: #1e293b;
-  border-color: #334155;
-  color: #f8fafc;
+.dark .premium-input {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: #f9fafb;
 }
 
-.dark .saas-input:focus {
-  border-color: #5B5CEB;
-  box-shadow: 0 0 0 4px rgba(91, 92, 235, 0.2);
+.dark .premium-input:focus {
+  border-color: #2563EB;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
 }
 
-/* Custom Scrollbars */
+/* Floating labels effect container */
+.floating-label-group {
+  position: relative;
+}
+
+/* Action Buttons Design */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  background-color: #2563EB;
+  color: #ffffff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.08);
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
+}
+
+.btn-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  background-color: #ffffff;
+  color: #111827;
+  border: 1px solid #E5E7EB;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.dark .btn-secondary {
+  background-color: #111827;
+  color: #f9fafb;
+  border-color: #374151;
+}
+
+.dark .btn-secondary:hover {
+  background-color: #1f2937;
+  border-color: #4b5563;
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  background-color: transparent;
+  color: #EF4444;
+  border: 1px solid #FEE2E2;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background-color: #FEF2F2;
+  border-color: #FCA5A5;
+}
+
+.dark .btn-danger {
+  border-color: #991b1b;
+}
+
+.dark .btn-danger:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: #f87171;
+}
+
+/* Scrollbar customizations */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -108,13 +242,60 @@
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #475569;
+  background: #4b5563;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
 
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+/* Animations */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-bg {
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+}
+
+.dark .shimmer-bg {
+  background: linear-gradient(90deg, #1f2937 25%, #374151 50%, #1f2937 75%);
+  background-size: 200% 100%;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }

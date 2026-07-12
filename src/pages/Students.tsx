@@ -219,32 +219,32 @@ export const Students: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Student Directory</h1>
-          <p className="text-xs text-slate-400 font-semibold">Administer student enrollment rosters, parent numbers, and RFID mappings.</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold">Administer student enrollment rosters, parent numbers, and RFID mappings.</p>
         </div>
 
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setIsImportOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+            className="btn-secondary text-[11px] py-1.5 px-3"
           >
             <Upload size={12} />
             <span>Bulk Import</span>
           </button>
           <a
             href="/api/students/export/excel"
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+            className="btn-secondary text-[11px] py-1.5 px-3"
           >
             <Download size={12} />
             <span>Export Roster</span>
           </a>
           <button
             onClick={openCreateModal}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors cursor-pointer"
+            className="btn-primary text-[11px] py-1.5 px-3.5"
           >
             <Plus size={12} />
             <span>Add Student</span>
@@ -253,7 +253,7 @@ export const Students: React.FC = () => {
       </div>
 
       {/* Filters Form */}
-      <div className="saas-card bg-white dark:bg-slate-900 p-5 rounded-[24px] border border-slate-200/80 dark:border-slate-800/80">
+      <div className="saas-card bg-white dark:bg-slate-900 p-5">
         <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-4 gap-4">
           <div className="relative">
             <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -264,14 +264,14 @@ export const Students: React.FC = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search Name or ID..."
-              className="block w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs placeholder-slate-400 focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/5 transition-all font-medium"
+              className="premium-input pl-9 text-xs py-2"
             />
           </div>
           <div>
             <select
               value={classFilter}
               onChange={(e) => setClassFilter(e.target.value)}
-              className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs focus:outline-none font-medium"
+              className="premium-input text-xs py-2 cursor-pointer bg-white dark:bg-slate-900"
             >
               <option value="">All Classes</option>
               <option value="Class 5">Class 5</option>
@@ -283,7 +283,7 @@ export const Students: React.FC = () => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs focus:outline-none font-medium"
+              className="premium-input text-xs py-2 cursor-pointer bg-white dark:bg-slate-900"
             >
               <option value="">All Statuses</option>
               <option value="active">Active</option>
@@ -292,7 +292,7 @@ export const Students: React.FC = () => {
           </div>
           <button
             type="submit"
-            className="w-full py-2 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-650 text-white font-semibold text-xs rounded-lg transition-colors cursor-pointer"
+            className="btn-primary text-xs py-2 w-full font-bold uppercase tracking-wider"
           >
             Filter Records
           </button>
@@ -300,11 +300,11 @@ export const Students: React.FC = () => {
       </div>
 
       {/* Roster Table */}
-      <div className="saas-card bg-white dark:bg-slate-900 rounded-[24px] border border-slate-200/80 dark:border-slate-800/80 overflow-hidden">
+      <div className="saas-card bg-white dark:bg-slate-900 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50/70 dark:bg-slate-850/50 border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-wider">
+              <tr className="bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-200/50 dark:border-slate-800/80 text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-wider">
                 <th className="px-6 py-3.5">Admission ID</th>
                 <th className="px-6 py-3.5">Name</th>
                 <th className="px-6 py-3.5">Class-Sec</th>
@@ -318,45 +318,45 @@ export const Students: React.FC = () => {
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
               {loading ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-8 text-center text-slate-400 font-medium">
+                  <td colSpan={8} className="px-6 py-8 text-center text-slate-450 font-bold">
                     Loading student directory...
                   </td>
                 </tr>
               ) : students.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-8 text-center text-slate-400 font-medium">
+                  <td colSpan={8} className="px-6 py-8 text-center text-slate-400 font-bold">
                     No student records found matching filters.
                   </td>
                 </tr>
               ) : (
                 students.map((st) => (
-                  <tr key={st.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-850/20 transition-colors">
-                    <td className="px-6 py-3.5 font-bold text-slate-700 dark:text-slate-300">{st.admission_number}</td>
+                  <tr key={st.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                    <td className="px-6 py-3.5 font-bold text-slate-700 dark:text-slate-350">{st.admission_number}</td>
                     <td className="px-6 py-3.5">
-                      <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center font-bold text-[10px] border border-primary-100">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-xl bg-primary-50 text-primary-600 dark:bg-primary-950/30 dark:text-primary-400 flex items-center justify-center font-bold text-[10px] border border-primary-100/50 dark:border-primary-900/30 shrink-0">
                           {st.name.slice(0, 2).toUpperCase()}
                         </div>
                         <span className="font-semibold text-slate-800 dark:text-slate-200">{st.name}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-3.5 font-semibold text-slate-600 dark:text-slate-300">{st.class_name}-{st.section}</td>
+                    <td className="px-6 py-3.5 font-bold text-slate-600 dark:text-slate-400">{st.class_name}-{st.section}</td>
                     <td className="px-6 py-3.5">
-                      <span className={`px-2 py-0.5 rounded-md font-bold text-[10px] ${st.rfid_card ? "bg-indigo-50 text-indigo-600 border border-indigo-100 dark:bg-indigo-950/20 dark:text-indigo-400 dark:border-indigo-900/30" : "bg-rose-50 text-rose-500 border border-rose-100 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/30"}`}>
+                      <span className={`px-2 py-0.5 rounded-md font-bold text-[10px] ${st.rfid_card ? "bg-primary-50 text-primary-600 border border-primary-100/50 dark:bg-primary-950/20 dark:text-primary-400 dark:border-primary-900/30" : "bg-danger-50 text-danger-500 border border-danger-100/50 dark:bg-danger-950/20 dark:text-danger-400 dark:border-danger-900/30"}`}>
                         {st.rfid_card?.uid || "Not Assigned"}
                       </span>
                     </td>
                     <td className="px-6 py-3.5 font-medium text-slate-500 dark:text-slate-400">
-                      <div className="text-slate-800 dark:text-slate-200 font-semibold">{st.parent?.father_name || "N/A"}</div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">{st.parent?.father_mobile}</div>
+                      <div className="text-slate-850 dark:text-slate-200 font-bold">{st.parent?.father_name || "N/A"}</div>
+                      <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-semibold">{st.parent?.father_mobile}</div>
                     </td>
                     <td className="px-6 py-3.5 font-medium text-slate-500 dark:text-slate-400">
-                      <div className="text-slate-800 dark:text-slate-200 font-semibold">{st.parent?.mother_name || "N/A"}</div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">{st.parent?.mother_mobile}</div>
+                      <div className="text-slate-850 dark:text-slate-200 font-bold">{st.parent?.mother_name || "N/A"}</div>
+                      <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-semibold">{st.parent?.mother_mobile}</div>
                     </td>
                     <td className="px-6 py-3.5">
                       <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase ${
-                        st.status === "active" ? "bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400" : "bg-rose-50 text-rose-600 border border-rose-100 dark:bg-rose-950/20 dark:text-rose-400"
+                        st.status === "active" ? "bg-success-50 text-success-600 border border-success-100/50 dark:bg-success-950/20 dark:text-success-400" : "bg-danger-50 text-danger-600 border border-danger-100/50 dark:bg-danger-950/20 dark:text-danger-400"
                       }`}>
                         {st.status}
                       </span>
@@ -366,7 +366,7 @@ export const Students: React.FC = () => {
                         <button
                           onClick={() => triggerQrModal(st)}
                           title="Generate Student QR Badge"
-                          className="p-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 dark:border-slate-800 dark:bg-slate-850 dark:hover:bg-slate-750 rounded-lg text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
+                          className="p-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 dark:border-slate-800 dark:bg-slate-800 dark:hover:bg-slate-750 rounded-lg text-slate-650 dark:text-slate-350 transition-colors cursor-pointer"
                         >
                           <QrCode size={12} />
                         </button>
@@ -380,7 +380,7 @@ export const Students: React.FC = () => {
                         <button
                           onClick={() => handleDelete(st.id)}
                           title="Delete Student"
-                          className="p-1.5 bg-rose-50 hover:bg-rose-100 border border-rose-100 dark:bg-rose-950/20 dark:border-rose-900/30 rounded-lg text-rose-500 transition-colors cursor-pointer"
+                          className="p-1.5 bg-danger-50 hover:bg-danger-100 border border-danger-100 dark:bg-danger-950/20 dark:border-danger-900/30 rounded-lg text-danger-500 transition-colors cursor-pointer"
                         >
                           <Trash2 size={12} />
                         </button>
@@ -394,23 +394,23 @@ export const Students: React.FC = () => {
         </div>
 
         {/* Pagination Footer */}
-        <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between">
-          <span className="text-slate-400 font-semibold text-xs">Total Records: {total}</span>
+        <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+          <span className="text-slate-400 dark:text-slate-500 font-bold text-xs">Total Records: {total}</span>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page === 1}
-              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850 disabled:opacity-50 cursor-pointer"
+              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 cursor-pointer"
             >
-              <ChevronLeft size={14} />
+              <ChevronLeft size={13} />
             </button>
-            <span className="text-xs font-bold px-3 py-1 border border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50 dark:bg-slate-850">{page}</span>
+            <span className="text-xs font-bold px-3 py-1 border border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300">{page}</span>
             <button
               onClick={() => setPage(page + 1)}
               disabled={students.length < limit}
-              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850 disabled:opacity-50 cursor-pointer"
+              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 cursor-pointer"
             >
-              <ChevronRight size={14} />
+              <ChevronRight size={13} />
             </button>
           </div>
         </div>
@@ -419,10 +419,10 @@ export const Students: React.FC = () => {
       {/* --- ADD / EDIT STUDENT MODAL --- */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/30 dark:bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl border border-slate-200 dark:border-slate-800 animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl border border-slate-200 dark:border-slate-800 animate-slide-up">
             <div className="flex justify-between items-center pb-4 mb-6 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="font-bold text-sm text-slate-800 dark:text-slate-100">{formMode === "create" ? "Add New Student Record" : "Edit Student Details"}</h3>
-              <button onClick={() => setIsModalOpen(false)} className="p-1 text-slate-400 hover:bg-slate-50 rounded-full">
+              <h3 className="font-bold text-sm text-slate-850 dark:text-slate-100">{formMode === "create" ? "Add New Student Record" : "Edit Student Details"}</h3>
+              <button onClick={() => setIsModalOpen(false)} className="p-1 text-slate-400 hover:bg-slate-50 rounded-full cursor-pointer">
                 <X size={18} />
               </button>
             </div>
@@ -430,34 +430,34 @@ export const Students: React.FC = () => {
             <form onSubmit={handleFormSubmit} className="space-y-6">
               {/* Student Profile */}
               <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Student Profile</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">Student Profile</span>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3">
                   <div>
-                    <label className="block text-slate-400 text-[10px] uppercase font-semibold mb-1.5">Admission ID</label>
+                    <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-semibold mb-1.5">Admission ID</label>
                     <input
                       type="text"
                       value={formAdmissionNumber}
                       onChange={(e) => setFormAdmissionNumber(e.target.value)}
-                      className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs placeholder-slate-400 focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/5 transition-all font-medium"
+                      className="premium-input text-xs py-2"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-400 text-[10px] uppercase font-semibold mb-1.5">Roll Number</label>
+                    <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-semibold mb-1.5">Roll Number</label>
                     <input
                       type="text"
                       value={formRollNumber}
                       onChange={(e) => setFormRollNumber(e.target.value)}
-                      className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs placeholder-slate-400 focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/5 transition-all font-medium"
+                      className="premium-input text-xs py-2"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-400 text-[10px] uppercase font-semibold mb-1.5">Student Name</label>
+                    <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-semibold mb-1.5">Student Name</label>
                     <input
                       type="text"
                       value={formName}
                       onChange={(e) => setFormName(e.target.value)}
-                      className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs placeholder-slate-400 focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/5 transition-all font-medium"
+                      className="premium-input text-xs py-2"
                       required
                     />
                   </div>
@@ -465,31 +465,31 @@ export const Students: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3">
                   <div>
-                    <label className="block text-slate-400 text-[10px] uppercase font-semibold mb-1.5">Class</label>
+                    <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-semibold mb-1.5">Class</label>
                     <input
                       type="text"
                       value={formClass}
                       onChange={(e) => setFormClass(e.target.value)}
-                      className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs placeholder-slate-400 focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/5 transition-all font-medium"
+                      className="premium-input text-xs py-2"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-400 text-[10px] uppercase font-semibold mb-1.5">Section</label>
+                    <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-semibold mb-1.5">Section</label>
                     <input
                       type="text"
                       value={formSection}
                       onChange={(e) => setFormSection(e.target.value)}
-                      className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs placeholder-slate-400 focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/5 transition-all font-medium"
+                      className="premium-input text-xs py-2"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-400 text-[10px] uppercase font-semibold mb-1.5">Gender</label>
+                    <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-semibold mb-1.5">Gender</label>
                     <select
                       value={formGender}
                       onChange={(e) => setFormGender(e.target.value)}
-                      className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs focus:outline-none font-medium"
+                      className="premium-input text-xs py-2 cursor-pointer bg-white dark:bg-slate-900"
                     >
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
@@ -500,30 +500,30 @@ export const Students: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3">
                   <div>
-                    <label className="block text-slate-400 text-[10px] uppercase font-semibold mb-1.5">Date of Birth</label>
+                    <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-semibold mb-1.5">Date of Birth</label>
                     <input
                       type="date"
                       value={formDob}
                       onChange={(e) => setFormDob(e.target.value)}
-                      className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs focus:outline-none font-medium"
+                      className="premium-input text-xs py-2 cursor-pointer bg-white dark:bg-slate-900"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-400 text-[10px] uppercase font-semibold mb-1.5">RFID Card UID</label>
+                    <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-semibold mb-1.5">RFID Card UID</label>
                     <input
                       type="text"
                       value={formRfid}
                       onChange={(e) => setFormRfid(e.target.value)}
                       placeholder="RFID UID"
-                      className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs placeholder-slate-400 focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/5 transition-all font-medium"
+                      className="premium-input text-xs py-2"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-400 text-[10px] uppercase font-semibold mb-1.5">Status</label>
+                    <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-semibold mb-1.5">Status</label>
                     <select
                       value={formStatus}
                       onChange={(e) => setFormStatus(e.target.value)}
-                      className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs focus:outline-none font-medium"
+                      className="premium-input text-xs py-2 cursor-pointer bg-white dark:bg-slate-900"
                     >
                       <option value="active">Active</option>
                       <option value="blocked">Blocked</option>
@@ -532,11 +532,11 @@ export const Students: React.FC = () => {
                 </div>
 
                 <div className="mt-3">
-                  <label className="block text-slate-400 text-[10px] uppercase font-semibold mb-1.5">Address</label>
+                  <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-semibold mb-1.5">Address</label>
                   <textarea
                     value={formAddress}
                     onChange={(e) => setFormAddress(e.target.value)}
-                    className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs focus:outline-none font-medium"
+                    className="premium-input text-xs py-2"
                     rows={2}
                   ></textarea>
                 </div>
@@ -544,47 +544,47 @@ export const Students: React.FC = () => {
 
               {/* Parents Contacts Fields */}
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
-                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Parent Contacts</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">Parent Contacts</span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
                   <div>
-                    <label className="block text-slate-400 text-[10px] uppercase font-semibold mb-1.5">Father's Name</label>
+                    <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-semibold mb-1.5">Father's Name</label>
                     <input
                       type="text"
                       value={formFatherName}
                       onChange={(e) => setFormFatherName(e.target.value)}
-                      className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs placeholder-slate-400 focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/5 transition-all font-medium"
+                      className="premium-input text-xs py-2"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-400 text-[10px] uppercase font-semibold mb-1.5">Father's Mobile Number</label>
+                    <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-semibold mb-1.5">Father's Mobile Number</label>
                     <input
                       type="text"
                       value={formFatherMobile}
                       onChange={(e) => setFormFatherMobile(e.target.value)}
-                      className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs placeholder-slate-400 focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/5 transition-all font-medium"
+                      className="premium-input text-xs py-2"
                       required
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
                   <div>
-                    <label className="block text-slate-400 text-[10px] uppercase font-semibold mb-1.5">Mother's Name</label>
+                    <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-semibold mb-1.5">Mother's Name</label>
                     <input
                       type="text"
                       value={formMotherName}
                       onChange={(e) => setFormMotherName(e.target.value)}
-                      className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs placeholder-slate-400 focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/5 transition-all font-medium"
+                      className="premium-input text-xs py-2"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-400 text-[10px] uppercase font-semibold mb-1.5">Mother's Mobile Number</label>
+                    <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-semibold mb-1.5">Mother's Mobile Number</label>
                     <input
                       type="text"
                       value={formMotherMobile}
                       onChange={(e) => setFormMotherMobile(e.target.value)}
-                      className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs placeholder-slate-400 focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/5 transition-all font-medium"
+                      className="premium-input text-xs py-2"
                       required
                     />
                   </div>
@@ -595,13 +595,13 @@ export const Students: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-slate-200 dark:border-slate-700 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-300 cursor-pointer"
+                  className="btn-secondary text-xs py-2 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors cursor-pointer"
+                  className="btn-primary text-xs py-2 cursor-pointer"
                 >
                   Save Record
                 </button>
@@ -614,10 +614,10 @@ export const Students: React.FC = () => {
       {/* --- BULK IMPORT MODAL --- */}
       {isImportOpen && (
         <div className="fixed inset-0 bg-slate-900/30 dark:bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800">
             <div className="flex justify-between items-center pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
               <h3 className="font-bold text-sm text-slate-800 dark:text-slate-100">Bulk Import Students</h3>
-              <button onClick={() => setIsImportOpen(false)} className="p-1 text-slate-400 hover:bg-slate-50 rounded-full">
+              <button onClick={() => setIsImportOpen(false)} className="p-1 text-slate-400 hover:bg-slate-50 rounded-full cursor-pointer">
                 <X size={18} />
               </button>
             </div>
@@ -625,8 +625,8 @@ export const Students: React.FC = () => {
             <form onSubmit={handleImportSubmit} className="space-y-4">
               <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-6 text-center">
                 <FileSpreadsheet className="mx-auto text-primary-500 mb-3" size={32} />
-                <label className="block text-xs font-semibold text-slate-500 mb-2 cursor-pointer">
-                  <span>Upload Excel Spreadsheet (.xlsx, .xls)</span>
+                <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 cursor-pointer">
+                  <span className="hover:text-primary-500 transition-colors">Upload Excel Spreadsheet (.xlsx, .xls)</span>
                   <input
                     type="file"
                     accept=".xlsx, .xls"
@@ -635,7 +635,7 @@ export const Students: React.FC = () => {
                   />
                 </label>
                 {importFile && (
-                  <p className="text-xs font-bold text-indigo-600 mt-2">{importFile.name}</p>
+                  <p className="text-xs font-bold text-primary-600 mt-2">{importFile.name}</p>
                 )}
               </div>
 
@@ -643,13 +643,13 @@ export const Students: React.FC = () => {
                 <a
                   href="/templates/student_import_template.xlsx"
                   download
-                  className="flex-1 py-2 border border-slate-200 dark:border-slate-700 text-center font-bold text-[10px] text-slate-500 uppercase rounded-xl hover:bg-slate-50"
+                  className="flex-1 py-2 border border-slate-200 dark:border-slate-700 text-center font-bold text-[10px] text-slate-500 uppercase rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-center transition-colors"
                 >
                   Get Template
                 </a>
                 <button
                   type="submit"
-                  className="flex-1 py-2 bg-primary-500 hover:bg-primary-600 text-white font-bold text-[10px] uppercase rounded-xl shadow-md cursor-pointer"
+                  className="flex-1 btn-primary py-2 text-[10px] uppercase tracking-wider cursor-pointer"
                 >
                   Upload File
                 </button>
@@ -662,24 +662,24 @@ export const Students: React.FC = () => {
       {/* --- QR BADGE DETAIL MODAL --- */}
       {isQrOpen && selectedStudent && (
         <div className="fixed inset-0 bg-slate-900/30 dark:bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-xs w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 text-center relative">
-            <button onClick={() => setIsQrOpen(false)} className="absolute top-4 right-4 p-1 text-slate-400 hover:bg-slate-50 rounded-full">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-xs w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 text-center relative">
+            <button onClick={() => setIsQrOpen(false)} className="absolute top-4 right-4 p-1 text-slate-400 hover:bg-slate-50 rounded-full cursor-pointer">
               <X size={16} />
             </button>
             
             <h3 className="font-bold text-sm text-slate-800 dark:text-slate-100 mb-4">Student ID Badge Mapping</h3>
 
-            <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl flex items-center justify-center border border-slate-100 dark:border-slate-800 mb-4">
+            <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl flex items-center justify-center border border-slate-200/50 dark:border-slate-800/60 mb-4">
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${selectedStudent.admission_number}`}
                 alt="Student QR Badge"
-                className="w-40 h-40 object-contain shadow-sm border border-slate-100 dark:border-slate-800"
+                className="w-40 h-40 object-contain shadow-xs rounded-lg"
               />
             </div>
 
             <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">{selectedStudent.name}</h4>
-            <p className="text-xs text-slate-400 font-semibold mt-1">Adm: {selectedStudent.admission_number}</p>
-            <p className="text-[10px] text-slate-400 font-bold bg-slate-50 dark:bg-slate-800 px-2.5 py-0.5 rounded-md inline-block mt-2 uppercase">
+            <p className="text-xs text-slate-400 dark:text-slate-550 font-semibold mt-1">Adm: {selectedStudent.admission_number}</p>
+            <p className="text-[10px] text-slate-450 dark:text-slate-400 font-bold bg-slate-50 dark:bg-slate-800 px-2.5 py-0.5 rounded-md inline-block mt-2 uppercase">
               {selectedStudent.class_name} - {selectedStudent.section}
             </p>
           </div>

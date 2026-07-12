@@ -100,145 +100,161 @@ export const RfidCards: React.FC = () => {
     }
   };
 
-  const handleDeleteCard = async (id: number, uid: string) => {
-    if (!window.confirm(`Are you sure you want to delete and deregister card "${uid}" completely?`)) return;
-    try {
-      await apiFetch(`/api/rfid/${id}`, { method: "DELETE" });
-      addToast("success", "RFID card deregistered successfully");
-      fetchRfidData();
-    } catch (err: any) {
-      addToast("error", err.message || "Failed to delete card");
-    }
-  };
-
-  const handleDeactivate = async (uid: string) => {
-    if (!window.confirm(`Are you sure you want to deactivate and unassign card: ${uid}?`)) return;
-    try {
-      await apiFetch(`/api/rfid/deactivate/${uid}`, { method: "POST" });
-      addToast("success", `Card ${uid} deactivated`);
-      fetchRfidData();
-    } catch (e: any) {
-      addToast("error", e.message || "Failed to deactivate card");
-    }
-  };
-
   const handleAssignSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!assignRfidUid || !assignStudentId) {
-      addToast("warning", "Please specify student and card UID");
+      addToast("warning", "Fill all fields to map RFID key");
       return;
     }
 
     try {
-      await apiFetch("/api/rfid/assign", {
+      await apiFetch("/api/rfid/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ student_id: parseInt(assignStudentId), rfid_uid: assignRfidUid })
+        body: JSON.stringify({
+          uid: assignRfidUid,
+          student_id: parseInt(assignStudentId),
+          status: "active"
+        })
       });
-      addToast("success", "Card successfully mapped to student");
+      addToast("success", "RFID card mapped to student successfully!");
       setIsAssignOpen(false);
       fetchRfidData();
+    } catch (err: any) {
+      addToast("error", err.message || "RFID Registration failed");
+    }
+  };
+
+  const handleDeactivate = async (id: number) => {
+    if (!window.confirm("Block this RFID card? Blocked cards trigger visual alerts when scanned.")) return;
+    try {
+      await apiFetch(`/api/rfid/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "blocked" })
+      });
+      addToast("success", "RFID card access blocked");
+      fetchRfidData();
     } catch (e: any) {
-      addToast("error", e.message || "Assignment failed");
+      addToast("error", e.message || "Deactivation failed");
+    }
+  };
+
+  const handleDeleteCard = async (id: number) => {
+    if (!window.confirm("Unlink and delete this card mapping?")) return;
+    try {
+      await apiFetch(`/api/rfid/${id}`, { method: "DELETE" });
+      addToast("success", "RFID card association removed");
+      fetchRfidData();
+    } catch (e: any) {
+      addToast("error", "Delete request rejected");
     }
   };
 
   return (
-    <div className="space-y-6 font-sans">
+    <div className="space-y-6 animate-fade-in font-sans">
+      {/* Top Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">RFID Admin Center</h1>
-          <p className="text-sm text-slate-400 font-semibold">Track scanning hardware logs, assign cards to students, and toggle active tags.</p>
+          <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">RFID Keys Manager</h1>
+          <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold">Map RFID credentials to student admission records, monitor active gateways, and block lost credentials.</p>
         </div>
 
-        {(user?.role === "Super Admin" || user?.role === "School Admin") && (
+        <div className="flex gap-2">
+          <button
+            onClick={fetchRfidData}
+            className="btn-secondary text-[11px] py-1.5 px-3 flex items-center gap-1.5"
+          >
+            <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
+            <span>Reload Logs</span>
+          </button>
           <button
             onClick={openAssignModal}
-            className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold rounded-xl shadow-md transition-all duration-200 hover:scale-[1.02] cursor-pointer"
+            className="btn-primary text-[11px] py-1.5 px-3.5 flex items-center gap-1.5"
           >
-            <Link2 size={14} />
-            <span>Assign RFID Card</span>
+            <Link2 size={12} />
+            <span>Assign Card</span>
           </button>
-        )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Active Cards Directory */}
+        {/* RFID Inventory Directory */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold tracking-tight">RFID Directory</h3>
-            <button onClick={fetchRfidData} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
-              <RefreshCw size={14} />
-            </button>
-          </div>
+          <div className="saas-card bg-white dark:bg-slate-900 overflow-hidden">
+            <div className="p-4 border-b border-slate-100 dark:border-slate-800/80 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/20">
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Assigned Keys Registry</span>
+              <span className="text-[10px] bg-primary-50 dark:bg-primary-950/30 text-primary-500 font-bold px-2 py-0.5 rounded border border-primary-100/50 dark:border-primary-900/30">
+                {cards.length} Keys mapped
+              </span>
+            </div>
 
-          <div className="rounded-2xl glass overflow-hidden border border-slate-200/60 shadow-sm dark:bg-slate-900/40">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-100/60 dark:bg-slate-800/40 text-slate-400 text-[10px] font-extrabold uppercase tracking-wider">
-                    <th className="px-6 py-4">Card UID</th>
-                    <th className="px-6 py-4">Assigned At</th>
-                    <th className="px-6 py-4">Last Active</th>
-                    <th className="px-6 py-4">Status</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
+                  <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-wider bg-slate-50/20">
+                    <th className="px-5 py-3">Card UID</th>
+                    <th className="px-5 py-3">Mapped Student</th>
+                    <th className="px-5 py-3">Register Date</th>
+                    <th className="px-5 py-3">Status</th>
+                    <th className="px-5 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
                   {loading ? (
                     <tr>
-                      <td colSpan={5} className="px-6 py-8 text-center text-slate-400">Loading catalog...</td>
+                      <td colSpan={5} className="px-5 py-6 text-center text-slate-400 font-bold uppercase tracking-wider animate-pulse">Loading Registry...</td>
                     </tr>
                   ) : cards.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-6 py-8 text-center text-slate-400">No RFID cards created yet.</td>
+                      <td colSpan={5} className="px-5 py-6 text-center text-slate-400 font-bold">No active RFID keys assigned.</td>
                     </tr>
                   ) : (
                     cards.map((c) => (
-                      <tr key={c.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-850/20">
-                        <td className="px-6 py-4 font-bold text-indigo-600 flex items-center gap-2">
-                          <CreditCard size={14} />
-                          <span>{c.uid}</span>
+                      <tr key={c.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/25 transition-colors">
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-2">
+                            <CreditCard size={14} className="text-slate-400" />
+                            <span className="font-bold text-slate-700 dark:text-slate-350">{c.uid}</span>
+                          </div>
                         </td>
-                        <td className="px-6 py-4 font-medium text-slate-400">{formatDate(c.assigned_at)}</td>
-                        <td className="px-6 py-4 font-medium text-slate-400">
-                          {formatTime(c.last_scanned_at)}
+                        <td className="px-5 py-3.5">
+                          <div className="font-bold text-slate-800 dark:text-slate-200">{c.student_name}</div>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500">Adm: {c.student_admission_number}</span>
                         </td>
-                        <td className="px-6 py-4">
-                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                            c.status === "active" ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"
+                        <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400 font-semibold">{formatDate(c.created_at)}</td>
+                        <td className="px-5 py-3.5">
+                          <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase ${
+                            c.status === "active" ? "bg-success-50 text-success-600 border border-success-100/50 dark:bg-success-950/20 dark:text-success-400" : "bg-danger-50 text-danger-600 border border-danger-100/50 dark:bg-danger-950/20 dark:text-danger-400"
                           }`}>
                             {c.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-right">
-                          <div className="flex items-center justify-end gap-2">
+                        <td className="px-5 py-3.5 text-right">
+                          <div className="flex justify-end gap-1.5">
+                            <button
+                              onClick={() => openEditModal(c)}
+                              title="Edit key configuration"
+                              className="p-1 rounded-md bg-slate-50 hover:bg-slate-100 border border-slate-200 dark:border-slate-800 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-650 dark:text-slate-350 transition-colors cursor-pointer"
+                            >
+                              <Edit2 size={11} />
+                            </button>
                             {c.status === "active" && (
                               <button
-                                onClick={() => handleDeactivate(c.uid)}
-                                className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-[10px] uppercase rounded-lg transition-all"
+                                onClick={() => handleDeactivate(c.id)}
+                                title="Block Card Access"
+                                className="p-1 rounded-md bg-warning-50 hover:bg-warning-100 border border-warning-100 text-warning-600 dark:bg-warning-950/20 dark:border-warning-900/30 transition-colors cursor-pointer"
                               >
-                                Deactivate
+                                <PowerOff size={11} />
                               </button>
                             )}
-                            {(user?.role === "Super Admin" || user?.role === "School Admin") && (
-                              <button
-                                onClick={() => openEditModal(c)}
-                                className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                                title="Edit Card"
-                              >
-                                <Edit2 size={12} />
-                              </button>
-                            )}
-                            {user?.role === "Super Admin" && (
-                              <button
-                                onClick={() => handleDeleteCard(c.id, c.uid)}
-                                className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                                title="Delete Card"
-                              >
-                                <Trash2 size={12} />
-                              </button>
-                            )}
+                            <button
+                              onClick={() => handleDeleteCard(c.id)}
+                              title="Delete card mapping"
+                              className="p-1 rounded-md bg-danger-50 hover:bg-danger-100 border border-danger-100 text-danger-500 dark:bg-danger-950/20 dark:border-danger-900/30 transition-colors cursor-pointer"
+                            >
+                              <Trash2 size={11} />
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -250,131 +266,168 @@ export const RfidCards: React.FC = () => {
           </div>
         </div>
 
-        {/* Scan Log History */}
+        {/* Scan Log History Timeline */}
         <div className="space-y-4">
-          <h3 className="text-base font-bold tracking-tight">Recent Scans</h3>
-          <div className="rounded-2xl glass p-5 dark:bg-slate-900/40 space-y-4 max-h-[450px] overflow-y-auto">
-            {loading ? (
-              <p className="text-center text-slate-400 text-xs py-6">Loading scan feeds...</p>
-            ) : history.length === 0 ? (
-              <p className="text-center text-slate-400 text-xs py-6">No scan events logged today.</p>
-            ) : (
-              history.map((h) => (
-                <div key={h.id} className="flex gap-3.5 items-start p-3 bg-slate-50/50 dark:bg-slate-800/30 rounded-xl border border-slate-100/10">
-                  <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/20 text-indigo-500 flex items-center justify-center shrink-0">
-                    <Clock size={16} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex justify-between items-center gap-2">
-                      <h4 className="font-bold text-xs truncate">{h.student_name}</h4>
-                      <span className="text-[9px] font-bold text-slate-400">{formatTime(h.timestamp)}</span>
+          <div className="saas-card bg-white dark:bg-slate-900 p-5 space-y-4">
+            <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800/80 pb-3">
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Live Scan Feed</span>
+              <span className="flex items-center gap-1 text-[9px] text-emerald-500 font-bold bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100/50 dark:border-emerald-900/30 px-2 py-0.5 rounded-full uppercase">
+                <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Active</span>
+              </span>
+            </div>
+
+            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1">
+              {loading ? (
+                <div className="text-center py-6 text-slate-400 font-bold uppercase tracking-wider animate-pulse text-[10px]">Loading Scan Feed...</div>
+              ) : history.length === 0 ? (
+                <p className="text-center text-slate-400 dark:text-slate-500 text-xs py-4">No card scans logged today.</p>
+              ) : (
+                history.map((h) => (
+                  <div key={h.id} className="p-3 bg-slate-50 hover:bg-slate-100/50 dark:bg-slate-800/40 dark:hover:bg-slate-800/70 border border-slate-200/50 dark:border-slate-800/80 rounded-xl transition-all flex items-start justify-between gap-3 text-xs">
+                    <div className="space-y-1 overflow-hidden">
+                      <div className="flex items-center gap-1.5">
+                        <CreditCard size={12} className="text-slate-400 shrink-0" />
+                        <span className="font-bold text-slate-700 dark:text-slate-350 truncate">{h.rfid_uid}</span>
+                      </div>
+                      <p className="font-bold text-slate-800 dark:text-slate-200 truncate">Student: {h.student_name}</p>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Class: {h.class_section} | Scanner: {h.gateway_name}</p>
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-0.5">UID: {h.rfid_uid}</p>
-                    <div className="flex items-center justify-between mt-1 text-[9px] font-extrabold uppercase">
-                      <span className="text-slate-400">{h.class_section}</span>
-                      <span className="text-emerald-500">{h.status}</span>
+
+                    <div className="text-right shrink-0 flex flex-col items-end gap-1.5">
+                      <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${
+                        h.status === "success" 
+                          ? "bg-success-50 text-success-600 border border-success-100/40 dark:bg-success-950/20" 
+                          : h.status === "blocked" 
+                            ? "bg-danger-50 text-danger-600 border border-danger-100/40 dark:bg-danger-950/20" 
+                            : "bg-warning-50 text-warning-600 border border-warning-100/40 dark:bg-warning-950/20"
+                      }`}>
+                        {h.status}
+                      </span>
+                      <span className="text-[9px] text-slate-450 dark:text-slate-500 font-semibold flex items-center gap-1">
+                        <Clock size={10} />
+                        <span>{formatTime(h.timestamp)}</span>
+                      </span>
                     </div>
                   </div>
-                </div>
-              ))
-            )}
+                ))
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* --- ASSIGN RFID CARD MODAL --- */}
+      {/* --- MAPPING CARD ASSIGN MODAL --- */}
       {isAssignOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 shadow-2xl animate-fade-in border border-slate-200 dark:border-slate-800">
+        <div className="fixed inset-0 bg-slate-900/30 dark:bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 animate-slide-up">
             <div className="flex justify-between items-center pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="font-extrabold text-sm text-slate-800 dark:text-slate-100">Assign Card mapping</h3>
-              <button onClick={() => setIsAssignOpen(false)} className="p-1.5 text-slate-400 hover:bg-slate-100 rounded-full">
+              <h3 className="font-bold text-sm text-slate-850 dark:text-slate-100">Register & Assign RFID Key</h3>
+              <button onClick={() => setIsAssignOpen(false)} className="p-1 text-slate-400 hover:bg-slate-50 rounded-full cursor-pointer">
                 <X size={18} />
               </button>
             </div>
 
             <form onSubmit={handleAssignSubmit} className="space-y-4">
               <div>
-                <label className="block text-slate-400 text-[10px] uppercase font-bold mb-1.5">Select Student</label>
-                <select
-                  value={assignStudentId}
-                  onChange={(e) => setAssignStudentId(e.target.value)}
-                  className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-750 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-primary-500 text-slate-800 dark:text-slate-100"
-                  required
-                >
-                  <option value="">-- Choose Student --</option>
-                  {studentsList.map((s) => (
-                    <option key={s.id} value={s.id}>{s.name} ({s.class_name}-{s.section})</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-slate-400 text-[10px] uppercase font-bold mb-1.5">Card UID</label>
+                <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-bold mb-1.5">RFID Card Physical UID</label>
                 <input
                   type="text"
                   value={assignRfidUid}
                   onChange={(e) => setAssignRfidUid(e.target.value)}
-                  placeholder="e.g. RFID_123_XYZ"
-                  className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-750 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-primary-500 text-slate-800 dark:text-slate-100"
+                  placeholder="UID Format (e.g. 04:A2:3B:5C)"
+                  className="premium-input text-xs py-2"
                   required
                 />
               </div>
 
-              <button
-                type="submit"
-                className="w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs uppercase rounded-xl shadow-md cursor-pointer"
-              >
-                Assign RFID
-              </button>
+              <div>
+                <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-bold mb-1.5">Assign to Student Profile</label>
+                <select
+                  value={assignStudentId}
+                  onChange={(e) => setAssignStudentId(e.target.value)}
+                  className="premium-input text-xs py-2 cursor-pointer bg-white dark:bg-slate-900"
+                  required
+                >
+                  <option value="">Choose Student from registry</option>
+                  {studentsList.map((st) => (
+                    <option key={st.id} value={st.id}>
+                      {st.name} (Adm ID: {st.admission_number} | Class: {st.class_name})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setIsAssignOpen(false)}
+                  className="btn-secondary text-xs py-2 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary text-xs py-2 cursor-pointer font-bold"
+                >
+                  Assign Key
+                </button>
+              </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* --- EDIT RFID CARD MODAL --- */}
-      {isEditOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 shadow-2xl animate-fade-in border border-slate-200 dark:border-slate-800">
+      {/* --- EDIT CARD CONFIG MODAL --- */}
+      {isEditOpen && editingCard && (
+        <div className="fixed inset-0 bg-slate-900/30 dark:bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 animate-slide-up">
             <div className="flex justify-between items-center pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="font-extrabold text-sm text-slate-800 dark:text-slate-100">Edit RFID Card</h3>
-              <button onClick={() => setIsEditOpen(false)} className="p-1.5 text-slate-400 hover:bg-slate-100 rounded-full">
+              <h3 className="font-bold text-sm text-slate-850 dark:text-slate-100">Edit RFID Card configuration</h3>
+              <button onClick={() => setIsEditOpen(false)} className="p-1 text-slate-400 hover:bg-slate-50 rounded-full cursor-pointer">
                 <X size={18} />
               </button>
             </div>
 
             <form onSubmit={handleEditSubmit} className="space-y-4">
               <div>
-                <label className="block text-slate-400 text-[10px] uppercase font-bold mb-1.5">Card UID</label>
+                <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-bold mb-1.5">Card UID</label>
                 <input
                   type="text"
                   value={editRfidUid}
                   onChange={(e) => setEditRfidUid(e.target.value)}
-                  placeholder="e.g. RFID_123_XYZ"
-                  className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-750 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-primary-500 text-slate-800 dark:text-slate-100"
+                  className="premium-input text-xs py-2"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-slate-400 text-[10px] uppercase font-bold mb-1.5">Status</label>
+                <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-bold mb-1.5">Access Status</label>
                 <select
                   value={editStatus}
                   onChange={(e) => setEditStatus(e.target.value)}
-                  className="block w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-750 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-primary-500 text-slate-800 dark:text-slate-100"
-                  required
+                  className="premium-input text-xs py-2 cursor-pointer bg-white dark:bg-slate-900"
                 >
-                  <option value="active">Active</option>
-                  <option value="deactivated">Deactivated</option>
+                  <option value="active">Active (Granted Access)</option>
+                  <option value="blocked">Blocked (Denied Access / Trigger Alarm)</option>
                 </select>
               </div>
 
-              <button
-                type="submit"
-                className="w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs uppercase rounded-xl shadow-md cursor-pointer"
-              >
-                Save Changes
-              </button>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setIsEditOpen(false)}
+                  className="btn-secondary text-xs py-2 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary text-xs py-2 cursor-pointer font-bold"
+                >
+                  Save Settings
+                </button>
+              </div>
             </form>
           </div>
         </div>
