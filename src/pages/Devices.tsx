@@ -129,10 +129,10 @@ export const Devices: React.FC = () => {
     }
   };
 
-  const handleDeleteDevice = async (id: number) => {
+  const handleDeleteDevice = async (deviceId: string) => {
     if (!window.confirm("Are you sure you want to remove this hardware node from database?")) return;
     try {
-      await apiFetch(`/api/device/${id}`, { method: "DELETE" });
+      await apiFetch(`/api/device/${deviceId}`, { method: "DELETE" });
       addToast("success", "Device successfully unregistered");
       fetchDevices();
     } catch (e: any) {
@@ -285,7 +285,7 @@ export const Devices: React.FC = () => {
                 )}
                 {(user?.role === "Super Admin" || user?.role === "School Admin") && (
                   <button
-                    onClick={() => handleDeleteDevice(d.id)}
+                    onClick={() => handleDeleteDevice(d.device_id)}
                     className="p-1.5 rounded-lg border border-danger-100 bg-danger-50 hover:bg-danger-100 text-danger-500 dark:bg-danger-950/20 dark:border-danger-900/30 transition-colors cursor-pointer"
                   >
                     <Trash2 size={11} />
