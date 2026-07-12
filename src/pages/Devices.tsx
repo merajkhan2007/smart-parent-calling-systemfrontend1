@@ -256,13 +256,15 @@ export const Devices: React.FC = () => {
               </div>
 
               <div className="flex gap-2">
-                <button
-                  onClick={() => openEditModal(d)}
-                  className="flex-1 btn-secondary py-1 text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 cursor-pointer"
-                >
-                  <Edit2 size={11} />
-                  <span>Configure</span>
-                </button>
+                {(user?.role === "Super Admin" || user?.role === "School Admin") && (
+                  <button
+                    onClick={() => openEditModal(d)}
+                    className="flex-1 btn-secondary py-1 text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 cursor-pointer"
+                  >
+                    <Edit2 size={11} />
+                    <span>Configure</span>
+                  </button>
+                )}
                 {d.status === "online" && (
                   <>
                     <button
@@ -281,7 +283,7 @@ export const Devices: React.FC = () => {
                     </button>
                   </>
                 )}
-                {user?.role === "Super Admin" && (
+                {(user?.role === "Super Admin" || user?.role === "School Admin") && (
                   <button
                     onClick={() => handleDeleteDevice(d.id)}
                     className="p-1.5 rounded-lg border border-danger-100 bg-danger-50 hover:bg-danger-100 text-danger-500 dark:bg-danger-950/20 dark:border-danger-900/30 transition-colors cursor-pointer"
