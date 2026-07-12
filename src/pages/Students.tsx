@@ -264,7 +264,7 @@ export const Students: React.FC = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search Name or ID..."
-              className="premium-input pl-9 text-xs py-2"
+              className="premium-input !pl-9 text-xs py-2"
             />
           </div>
           <div>
