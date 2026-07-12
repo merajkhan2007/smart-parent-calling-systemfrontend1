@@ -90,7 +90,7 @@ export const Dashboard: React.FC = () => {
           id: `call-${c.id}`,
           type: "call",
           time: formatTimelineTime(c.call_start),
-          title: `Call to {c.parent_type} of {c.student?.name}`,
+          title: `Call to ${c.parent_type} of ${c.student?.name}`,
           subtitle: `Status: ${c.status} | Duration: ${formatDuration(c.duration)}`,
           tag: c.status,
           rawTime: utcStr ? new Date(utcStr).getTime() : 0
