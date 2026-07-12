@@ -36,11 +36,12 @@ const formatDuration = (seconds: number) => {
 };
 
 export const Dashboard: React.FC = () => {
-  const { apiFetch } = useAuth();
+  const { apiFetch, selectedSchoolId } = useAuth();
   const { lastEvent } = useWebSocket();
   const { addToast } = useToast();
   
   const [loading, setLoading] = useState(true);
+  const [activeSettings, setActiveSettings] = useState<any>(null);
   const [stats, setStats] = useState<any>({
     total_students: 0,
     today_calls: 0,
@@ -64,7 +65,10 @@ export const Dashboard: React.FC = () => {
       const dbStats = await apiFetch("/api/rfid/scan-history"); // scan count
       const callData = await apiFetch("/api/call/?limit=5"); // latest calls
       const studentsData = await apiFetch("/api/students/?limit=1"); // total students
+      const settingsData = await apiFetch("/api/settings/"); // dynamic branding
       
+      setActiveSettings(settingsData);
+
       // Parse scans for timeline
       const timelineScans = (dbStats || []).map((s: any) => {
         const utcStr = s.timestamp && !s.timestamp.endsWith("Z") ? `${s.timestamp}Z` : s.timestamp;
@@ -86,7 +90,7 @@ export const Dashboard: React.FC = () => {
           id: `call-${c.id}`,
           type: "call",
           time: formatTimelineTime(c.call_start),
-          title: `Call to ${c.parent_type} of ${c.student?.name}`,
+          title: `Call to {c.parent_type} of {c.student?.name}`,
           subtitle: `Status: ${c.status} | Duration: ${formatDuration(c.duration)}`,
           tag: c.status,
           rawTime: utcStr ? new Date(utcStr).getTime() : 0
@@ -133,7 +137,7 @@ export const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [selectedSchoolId]);
 
   // Handle incoming live websocket notifications
   useEffect(() => {
@@ -180,12 +184,14 @@ export const Dashboard: React.FC = () => {
     }
   };
 
+  const currentSchoolName = activeSettings?.school_name || "Calling Gateway";
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Top dashboard summary header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Oakridge Calling Console</h1>
+          <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">{currentSchoolName} Console</h1>
           <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold">Smart calling gate and live RFID diagnostic center.</p>
         </div>
         

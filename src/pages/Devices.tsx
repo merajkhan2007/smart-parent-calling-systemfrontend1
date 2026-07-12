@@ -20,6 +20,17 @@ export const Devices: React.FC = () => {
   const [deviceId, setDeviceId] = useState("");
   const [deviceLoc, setDeviceLoc] = useState("");
   const [deviceClassroom, setDeviceClassroom] = useState("");
+  const [deviceSchoolId, setDeviceSchoolId] = useState("");
+  const [schoolsList, setSchoolsList] = useState<any[]>([]);
+
+  // Load schools list for Super Admin device allocations
+  useEffect(() => {
+    if (user?.role === "Super Admin") {
+      apiFetch("/api/schools/")
+        .then((data) => setSchoolsList(data || []))
+        .catch(() => setSchoolsList([]));
+    }
+  }, [user]);
 
   const fetchDevices = async () => {
     setLoading(true);
@@ -65,6 +76,7 @@ export const Devices: React.FC = () => {
     setDeviceId("");
     setDeviceLoc("");
     setDeviceClassroom("");
+    setDeviceSchoolId("");
     setIsModalOpen(true);
   };
 
@@ -75,6 +87,7 @@ export const Devices: React.FC = () => {
     setDeviceId(d.device_id);
     setDeviceLoc(d.location || "");
     setDeviceClassroom(d.classroom || "");
+    setDeviceSchoolId(d.school_id ? String(d.school_id) : "");
     setIsModalOpen(true);
   };
 
@@ -85,29 +98,27 @@ export const Devices: React.FC = () => {
       return;
     }
 
+    const payload: any = {
+      device_id: deviceId,
+      name: deviceName,
+      location: deviceLoc,
+      classroom: deviceClassroom,
+      school_id: deviceSchoolId ? parseInt(deviceSchoolId) : null
+    };
+
     try {
       if (modalMode === "register") {
         await apiFetch("/api/device/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            device_id: deviceId,
-            name: deviceName,
-            location: deviceLoc,
-            classroom: deviceClassroom
-          })
+          body: JSON.stringify(payload)
         });
         addToast("success", "Device successfully registered!");
       } else {
-        await apiFetch(`/api/device/${selectedDevice.id}`, {
+        await apiFetch(`/api/device/${selectedDevice.device_id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            device_id: deviceId,
-            name: deviceName,
-            location: deviceLoc,
-            classroom: deviceClassroom
-          })
+          body: JSON.stringify(payload)
         });
         addToast("success", "Device configurations updated");
       }
@@ -156,7 +167,7 @@ export const Devices: React.FC = () => {
           {(user?.role === "Super Admin" || user?.role === "School Admin") && (
             <button
               onClick={openRegisterModal}
-              className="btn-primary text-[11px] py-1.5 px-3.5 flex items-center gap-1.5"
+              className="btn-primary text-[11px] py-1.5 px-3.5 flex items-center gap-1.5 animate-fade-in"
             >
               <Plus size={12} />
               <span>Register Gateway</span>
@@ -173,7 +184,7 @@ export const Devices: React.FC = () => {
         </div>
       ) : devices.length === 0 ? (
         <div className="saas-card bg-white dark:bg-slate-900 border border-dashed p-10 text-center text-slate-400 font-semibold text-xs uppercase tracking-wider">
-          No hardware gates registered in this school profile.
+          No hardware gates registered.
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -182,7 +193,7 @@ export const Devices: React.FC = () => {
               <div>
                 <div className="flex items-start justify-between gap-2.5 pb-4 mb-4 border-b border-slate-100 dark:border-slate-800/80">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-xl border ${d.status === "online" ? "bg-primary-50 border-primary-100/50 text-primary-500 dark:bg-primary-950/20 dark:border-primary-900/30" : "bg-slate-50 border-slate-100 text-slate-450 dark:bg-slate-800 dark:border-slate-700"}`}>
+                    <div className={`p-2 rounded-xl border ${d.status === "online" ? "bg-primary-50 border-primary-100/50 text-primary-500 dark:bg-primary-950/20 dark:border-primary-900/30" : "bg-slate-50 border-slate-100 text-slate-455 dark:bg-slate-800 dark:border-slate-700"}`}>
                       <Cpu size={18} />
                     </div>
                     <div>
@@ -235,6 +246,12 @@ export const Devices: React.FC = () => {
                     <span>Firmware version:</span>
                     <span className="font-bold text-primary-500">{d.firmware_version || "1.0.0"}</span>
                   </div>
+                  {user?.role === "Super Admin" && (
+                    <div className="flex justify-between text-slate-400">
+                      <span>Assigned School ID:</span>
+                      <span className="font-bold text-accent-500">{d.school_id || "Unallocated / Global Inventory"}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -336,6 +353,25 @@ export const Devices: React.FC = () => {
                   className="premium-input text-xs py-2"
                 />
               </div>
+
+              {/* Super Admin School Context Assignment */}
+              {user?.role === "Super Admin" && (
+                <div>
+                  <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-bold mb-1.5">Allocated School System</label>
+                  <select
+                    value={deviceSchoolId}
+                    onChange={(e) => setDeviceSchoolId(e.target.value)}
+                    className="premium-input text-xs py-2 bg-white dark:bg-slate-900 cursor-pointer"
+                  >
+                    <option value="">Unallocated (Global Pool)</option>
+                    {schoolsList.map((sc) => (
+                      <option key={sc.id} value={sc.id}>
+                        {sc.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
                 <button

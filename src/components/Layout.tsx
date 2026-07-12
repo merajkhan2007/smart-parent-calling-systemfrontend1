@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useWebSocket } from "../context/WebSocketContext";
@@ -13,7 +13,7 @@ import {
   Bell,
   Settings,
   Shield,
-  School,
+  School as SchoolIcon,
   LogOut,
   Menu,
   X,
@@ -33,7 +33,7 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { user, logout } = useAuth();
+  const { user, selectedSchoolId, changeSchool, apiFetch, logout } = useAuth();
   const { isConnected } = useWebSocket();
   const location = useLocation();
   const navigate = useNavigate();
@@ -44,10 +44,44 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isCollapsed, setIsCollapsed] = useState(() => {
     return localStorage.getItem("spcs_sidebar_collapsed") === "true";
   });
-  const [unreadNotifications, setUnreadNotifications] = useState<any[]>([
-    { id: 1, type: "device_offline", message: "Classroom 5-A Scanner went offline", time: "10 mins ago" },
-    { id: 2, type: "sim_balance_low", message: "LTE module reports low SIM balance", time: "1 hour ago" }
-  ]);
+  
+  const [unreadNotifications, setUnreadNotifications] = useState<any[]>([]);
+  const [schools, setSchools] = useState<any[]>([]);
+  const [activeSettings, setActiveSettings] = useState<any>(null);
+
+  // Fetch settings dynamically to obtain current school name & logo
+  const fetchSettings = () => {
+    apiFetch("/api/settings/")
+      .then((data) => {
+        setActiveSettings(data);
+      })
+      .catch(() => setActiveSettings(null));
+  };
+
+  // Fetch schools list if Super Admin
+  useEffect(() => {
+    if (user?.role === "Super Admin") {
+      apiFetch("/api/schools/")
+        .then((data) => setSchools(data || []))
+        .catch(() => setSchools([]));
+    }
+  }, [user]);
+
+  // Fetch dynamic details on school context mount/change
+  useEffect(() => {
+    fetchSettings();
+    apiFetch("/api/notifications/?unread_only=true")
+      .then((data) => {
+        // Map to timeline logs
+        const mapped = (data || []).slice(0, 5).map((n: any) => ({
+          id: n.id,
+          message: n.message,
+          time: new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }));
+        setUnreadNotifications(mapped);
+      })
+      .catch(() => setUnreadNotifications([]));
+  }, [selectedSchoolId]);
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -76,13 +110,15 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     { name: "Reports", path: "/reports", icon: BarChart3 },
     { name: "Settings", path: "/settings", icon: Settings },
     { name: "Users", path: "/users", icon: Shield, roleLimit: ["Super Admin", "School Admin"] },
-    { name: "School Profile", path: "/school", icon: School, roleLimit: ["Super Admin", "School Admin"] }
+    { name: "School Profile", path: "/school", icon: SchoolIcon, roleLimit: ["Super Admin", "School Admin"] }
   ];
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
+
+  const currentSchoolName = activeSettings?.school_name || "Smart Parent Calling System";
 
   return (
     <div className="min-h-screen flex bg-bg-base text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans transition-colors duration-200">
@@ -92,110 +128,87 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         {!isCollapsed ? (
           <div className="h-16 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800">
             <Link to="/" className="flex items-center gap-2.5 overflow-hidden">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-primary-500 to-accent-500 flex items-center justify-center text-white shadow-sm shadow-primary-500/20 shrink-0 animate-pulse">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-primary-500 to-accent-500 flex items-center justify-center text-white shadow-sm shadow-primary-500/20 shrink-0">
                 <Volume2 size={16} />
               </div>
               <div className="transition-all duration-200">
-                <span className="font-bold text-sm text-slate-900 dark:text-white tracking-tight">Oakridge SPCS</span>
-                <p className="text-[8px] text-slate-400 font-bold tracking-wider -mt-0.5">ENTERPRISE DIALER</p>
+                <span className="font-bold text-sm text-slate-900 dark:text-white tracking-tight truncate max-w-[120px] block">
+                  {currentSchoolName.split(" ")[0]} SPCS
+                </span>
+                <p className="text-[8px] text-slate-400 font-bold tracking-wider -mt-0.5 uppercase">Enterprise Dialer</p>
               </div>
             </Link>
-            <button onClick={toggleCollapse} className="p-1 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-all dark:border-slate-800 dark:hover:bg-slate-800 cursor-pointer">
-              <ChevronLeft size={13} />
+            <button
+              onClick={toggleCollapse}
+              className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+            >
+              <ChevronLeft size={16} />
             </button>
           </div>
         ) : (
-          <div className="h-16 flex items-center justify-center border-b border-slate-100 dark:border-slate-800">
-            <button onClick={toggleCollapse} className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-all dark:border-slate-800 dark:hover:bg-slate-800 cursor-pointer">
-              <ChevronRight size={13} />
+          <div className="h-16 flex items-center justify-center border-b border-slate-100 dark:border-slate-800 relative">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-primary-500 to-accent-500 flex items-center justify-center text-white shadow-sm shadow-primary-500/20">
+              <Volume2 size={16} />
+            </div>
+            <button
+              onClick={toggleCollapse}
+              className="absolute -right-3 top-5 w-6 h-6 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 shadow-sm z-30 cursor-pointer"
+            >
+              <ChevronRight size={12} />
             </button>
           </div>
         )}
 
-        {/* Navigation list */}
-        <nav className="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto">
-          {navItems.map((item) => {
-            if (item.roleLimit && (!user || !item.roleLimit.includes(user.role))) return null;
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.name}
-                to={item.path}
-                className={`flex items-center rounded-xl text-sm transition-all duration-200 relative group/nav ${
-                  isCollapsed ? "justify-center p-2.5 w-10 h-10 mx-auto" : "gap-3 px-4 py-2.5"
-                } ${
-                  isActive
-                    ? "bg-gradient-to-r from-primary-500 to-accent-500 text-white font-semibold shadow-sm shadow-primary-500/10"
-                    : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/30 font-medium"
-                }`}
-              >
-                <Icon size={17} className={isActive ? "text-white" : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"} />
-                {!isCollapsed && <span>{item.name}</span>}
-                {isCollapsed && (
-                  <div className="absolute left-14 bg-slate-900 text-white text-2xs font-semibold px-2 py-1 rounded shadow-lg opacity-0 pointer-events-none group-hover/nav:opacity-100 transition-opacity z-50 whitespace-nowrap">
-                    {item.name}
-                  </div>
-                )}
-              </Link>
-            );
-          })}
+        {/* Sidebar Nav Items */}
+        <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+          {navItems
+            .filter((item) => !item.roleLimit || (user && item.roleLimit.includes(user.role)))
+            .map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-all duration-200 ${
+                    isActive
+                      ? "bg-gradient-to-r from-primary-500 to-accent-500 text-white font-bold shadow-sm shadow-primary-500/10"
+                      : "text-slate-500 dark:text-slate-450 hover:bg-slate-50 dark:hover:bg-slate-800/30 font-semibold"
+                  }`}
+                  title={isCollapsed ? item.name : undefined}
+                >
+                  <Icon size={17} className={isActive ? "text-white" : "text-slate-400"} />
+                  {!isCollapsed && <span>{item.name}</span>}
+                </Link>
+              );
+            })}
         </nav>
 
-        {/* Bottom Profile Footer */}
-        {isCollapsed ? (
-          <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex justify-center">
-            <button
-              onClick={handleLogout}
-              title="Sign Out"
-              className="p-2 rounded-xl text-rose-500 hover:bg-rose-500/10 transition-all cursor-pointer"
-            >
-              <LogOut size={16} />
-            </button>
-          </div>
-        ) : (
-          <div className="p-4 border-t border-slate-100 dark:border-slate-800">
-            <div className="flex items-center gap-3 mb-3 px-2">
-              <div className="w-8.5 h-8.5 rounded-xl bg-primary-50 dark:bg-primary-950/40 text-primary-500 font-bold text-xs flex items-center justify-center border border-primary-100 dark:border-primary-900">
-                {user?.name?.slice(0, 2) || "AD"}
-              </div>
-              <div className="overflow-hidden flex-1">
-                <h4 className="font-semibold text-xs text-slate-800 dark:text-slate-200 truncate">{user?.name || "SPCS User"}</h4>
-                <p className="text-[10px] text-slate-400 truncate capitalize font-semibold">{user?.role || "Staff"}</p>
-              </div>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-rose-500 hover:text-rose-600 font-bold text-xs transition-colors hover:bg-rose-500/5 cursor-pointer"
-            >
-              <LogOut size={13} />
-              <span>Sign Out</span>
-            </button>
-          </div>
-        )}
+        {/* Sidebar Footer Logout */}
+        <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-danger-500 hover:text-danger-600 font-bold text-xs hover:bg-danger-500/5 cursor-pointer"
+          >
+            <LogOut size={14} />
+            {!isCollapsed && <span>Sign Out</span>}
+          </button>
+        </div>
       </aside>
 
-      {/* Sidebar - Mobile drawer */}
+      {/* Sidebar - Mobile Menu Drawer */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 bg-slate-900/30 dark:bg-black/60 backdrop-blur-xs z-50 lg:hidden">
-          <aside className="w-72 max-w-[80vw] h-full flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800">
+        <div className="fixed inset-0 z-40 flex lg:hidden">
+          <div className="fixed inset-0 bg-slate-900/30 backdrop-blur-xs" onClick={() => setIsMobileMenuOpen(false)}></div>
+          <aside className="relative flex flex-col w-64 max-w-xs bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800/80 animate-slide-right">
             <div className="h-16 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-primary-500 to-accent-500 flex items-center justify-center text-white shadow-sm shadow-primary-500/20">
-                  <Volume2 size={16} />
-                </div>
-                <div>
-                  <span className="font-bold text-sm text-slate-900 dark:text-white">Oakridge SPCS</span>
-                  <p className="text-[8px] text-slate-400 font-bold tracking-wider -mt-0.5">ENTERPRISE DIALER</p>
-                </div>
-              </div>
-              <button onClick={() => setIsMobileMenuOpen(false)} className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer">
-                <X size={20} />
+              <span className="font-bold text-sm text-slate-800 dark:text-white uppercase tracking-tight">SPCS Roster</span>
+              <button onClick={() => setIsMobileMenuOpen(false)} className="p-1 rounded-lg text-slate-400 cursor-pointer">
+                <X size={18} />
               </button>
             </div>
-            <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
+            <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
               {navItems.map((item) => {
-                if (item.roleLimit && (!user || !item.roleLimit.includes(user.role))) return null;
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
                 return (
@@ -218,7 +231,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div className="p-4 border-t border-slate-100 dark:border-slate-800">
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-rose-500 hover:text-rose-600 font-bold text-xs hover:bg-rose-500/5 cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-danger-550 hover:text-danger-600 font-bold text-xs hover:bg-danger-500/5 cursor-pointer"
               >
                 <LogOut size={14} />
                 <span>Sign Out</span>
@@ -240,7 +253,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               <Menu size={18} />
             </button>
 
-            {/* Premium Search Bar */}
+            {/* Search Bar */}
             <div className="relative max-w-xs w-full hidden md:block">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                 <Search size={14} />
@@ -248,14 +261,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               <input
                 type="text"
                 className="block w-full pl-9 pr-4 py-1.5 bg-slate-50 hover:bg-slate-100/50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs placeholder-slate-450 focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/5 transition-all font-medium text-slate-700 dark:text-slate-200"
-                placeholder="Search database... (Press /)"
+                placeholder="Search database..."
               />
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Real-time Hardware Connectivity state */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-emerald-50 dark:bg-emerald-950/20 text-[10px] font-bold border border-emerald-100/40 dark:border-emerald-900/30 rounded-full text-emerald-600 dark:text-emerald-400">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-emerald-50 dark:bg-emerald-950/20 text-[10px] font-bold border border-emerald-100/40 dark:border-emerald-900/30 rounded-full text-emerald-600 dark:text-emerald-400 animate-fade-in">
               <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? "bg-emerald-500 animate-pulse" : "bg-rose-500 animate-ping"}`}></span>
               <span>
                 {isConnected ? "LTE Server Online" : "Reconnecting Link"}
@@ -263,26 +276,40 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
 
             {/* School Profile Selector Dropdown */}
-            <div className="relative group hidden lg:block">
-              <button className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 transition-all cursor-pointer">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                <span>Oakridge International</span>
-                <ChevronDown size={11} className="text-slate-400 transition-transform group-hover:rotate-180 duration-150" />
-              </button>
-              <div className="absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl opacity-0 translate-y-1 invisible group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible transition-all duration-200 z-50 p-1">
-                <button className="w-full text-left px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 text-[11px] font-bold text-primary-500">
-                  Oakridge International
+            {user?.role === "Super Admin" ? (
+              <div className="relative group hidden lg:block">
+                <button className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 transition-all cursor-pointer">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span>{currentSchoolName}</span>
+                  <ChevronDown size={11} className="text-slate-400 transition-transform group-hover:rotate-180 duration-150" />
                 </button>
-                <button className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-[11px] font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-                  Pinecrest Secondary
-                </button>
+                <div className="absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl opacity-0 translate-y-1 invisible group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible transition-all duration-200 z-50 p-1">
+                  {schools.map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => changeSchool(s.id)}
+                      className={`w-full text-left px-3 py-1.5 rounded-lg text-[11px] mb-0.5 cursor-pointer block ${
+                        s.id === selectedSchoolId
+                          ? "bg-primary-50 dark:bg-primary-950/20 font-bold text-primary-500"
+                          : "hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                      }`}
+                    >
+                      {s.name}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 dark:bg-slate-850 rounded-xl text-xs font-bold text-slate-750 dark:text-slate-350 select-none">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary-500"></span>
+                <span>{currentSchoolName}</span>
+              </div>
+            )}
 
             {/* Quick Actions CTA button */}
             <Link
               to="/students"
-              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-primary-500 hover:bg-primary-600 text-white text-[11px] font-bold rounded-lg shadow-sm shadow-primary-500/10 transition-all cursor-pointer"
+              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-primary-500 hover:bg-primary-600 text-white text-[11px] font-bold rounded-lg shadow-sm shadow-primary-500/10 transition-all cursor-pointer animate-fade-in"
             >
               <Plus size={12} />
               <span>Register Student</span>
@@ -292,7 +319,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <button
               onClick={() => window.location.reload()}
               title="Refresh State"
-              className="p-2 rounded-xl text-slate-400 hover:text-slate-750 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer"
+              className="p-2 rounded-xl text-slate-450 hover:text-slate-750 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer"
             >
               <RefreshCw size={14} />
             </button>
@@ -300,7 +327,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             {/* Dark Mode toggle */}
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-xl text-slate-450 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-slate-455 hover:text-slate-800 dark:text-slate-550 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
             >
               {isDarkMode ? <Sun size={15} /> : <Moon size={15} />}
             </button>
@@ -313,7 +340,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               >
                 <Bell size={15} />
                 {unreadNotifications.length > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                  <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
                 )}
               </button>
 
@@ -323,14 +350,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     <span className="font-bold text-xs text-slate-800 dark:text-slate-200">Alerts & Incidents</span>
                     <button
                       onClick={() => setUnreadNotifications([])}
-                      className="text-[10px] text-primary-500 hover:text-primary-600 font-bold"
+                      className="text-[10px] text-primary-500 hover:text-primary-650 font-bold cursor-pointer"
                     >
                       Clear All
                     </button>
                   </div>
                   <div className="max-h-60 overflow-y-auto py-1">
                     {unreadNotifications.length === 0 ? (
-                      <p className="text-center py-6 text-xs text-slate-400 font-semibold">All systems green.</p>
+                      <p className="text-center py-6 text-xs text-slate-400 dark:text-slate-500 font-semibold">All systems green.</p>
                     ) : (
                       unreadNotifications.map((n) => (
                           <div
@@ -338,7 +365,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                             className="px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/30 rounded-lg transition-colors mb-0.5 cursor-pointer"
                           >
                             <p className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 leading-normal">{n.message}</p>
-                            <span className="text-[9px] text-slate-400 font-semibold mt-0.5 block">{n.time}</span>
+                            <span className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold mt-0.5 block">{n.time}</span>
                           </div>
                       ))
                     )}
@@ -356,7 +383,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               )}
             </div>
 
-            {/* Premium Profile Dropdown */}
+            {/* Profile Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -372,11 +399,12 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <div className="absolute right-0 mt-3 w-48 rounded-xl bg-white dark:bg-slate-900 shadow-xl border border-slate-200 dark:border-slate-800 z-50 p-1.5 animate-slide-up">
                   <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
                     <h5 className="font-bold text-xs text-slate-900 dark:text-white truncate">{user?.name || "SPCS User"}</h5>
-                    <p className="text-[10px] text-slate-400 font-semibold truncate">{user?.email || "admin@spcs.com"}</p>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-550 font-semibold truncate">{user?.email || "admin@spcs.com"}</p>
+                    <p className="text-[9px] text-slate-350 dark:text-slate-500 font-bold uppercase mt-0.5">{user?.role || "Staff"}</p>
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg text-rose-500 hover:bg-rose-500/5 font-bold text-xs transition-colors mt-1 cursor-pointer"
+                    className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg text-danger-550 hover:bg-danger-500/5 font-bold text-xs transition-colors mt-1 cursor-pointer"
                   >
                     <LogOut size={13} />
                     <span>Sign Out</span>
@@ -395,4 +423,3 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     </div>
   );
 };
-
