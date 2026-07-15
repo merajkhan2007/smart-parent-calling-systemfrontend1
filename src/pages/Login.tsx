@@ -67,7 +67,7 @@ export const Login: React.FC = () => {
           {/* School branding header */}
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Smart Parent Calling</h1>
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 font-bold mt-1.5 uppercase tracking-wider">Oakridge SPCS Gateway</p>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 font-bold mt-1.5 uppercase tracking-wider">IMPACT ARROWS SPCS Gateway</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
