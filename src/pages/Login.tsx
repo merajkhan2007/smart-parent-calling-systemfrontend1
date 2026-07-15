@@ -103,8 +103,8 @@ export const Login: React.FC = () => {
                 onChange={(e) => setRememberMe(e.target.checked)}
                 className="h-4 w-4 rounded border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-primary-500 focus:ring-primary-500/20 focus:ring-offset-white dark:focus:ring-offset-slate-900 cursor-pointer"
               />
-              <label htmlFor="remember_me" className="ml-2 block text-2xs font-bold text-slate-400 dark:text-slate-500 select-none cursor-pointer uppercase tracking-wider">
-                Remember my session
+              <label htmlFor="remember_me" className="ml-2 block text-[10px] font-bold text-slate-400 dark:text-slate-500 select-none cursor-pointer uppercase tracking-wider">
+                Remember my console
               </label>
             </div>
 
