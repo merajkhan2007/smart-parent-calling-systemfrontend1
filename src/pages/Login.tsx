@@ -39,10 +39,10 @@ export const Login: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center p-6 bg-bg-base dark:bg-slate-950 font-sans relative overflow-hidden transition-colors duration-200">
       {/* Decorative luxury gradient background glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] bg-gradient-to-b from-primary-500/8 to-transparent blur-[120px] pointer-events-none rounded-full" />
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary-500/10 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-accent-500/8 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary-500/10 rounded-full blur-[100px] pointer-events-none animate-float" />
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-accent-500/8 rounded-full blur-[100px] pointer-events-none animate-float-reverse" />
       
-      <div className="w-full max-w-md z-10 animate-fade-in">
+      <div className="w-full max-w-md z-10 animate-slide-up">
         <div className="saas-card bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xl relative overflow-hidden">
           {/* School branding header */}
           <div className="text-center mb-8">
@@ -112,7 +112,7 @@ export const Login: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full btn-primary py-3 px-4 flex items-center justify-center gap-2 cursor-pointer shadow-md"
+              className="w-full btn-primary py-3 px-4 flex items-center justify-center gap-2 cursor-pointer shadow-md transition-all duration-300 hover:shadow-lg hover:shadow-primary-500/20 active:scale-[0.98]"
             >
               {isSubmitting ? (
                 <>
