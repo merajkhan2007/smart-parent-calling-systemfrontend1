@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import { Lock, Mail, Eye, EyeOff, Loader2, Landmark } from "lucide-react";
+import { Lock, Mail, Eye, EyeOff, Loader2 } from "lucide-react";
+import logo from "../assets/logo.png";
 
 export const Login: React.FC = () => {
   const { login } = useAuth();
@@ -58,16 +59,20 @@ export const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-bg-base dark:bg-slate-950 font-sans relative overflow-hidden transition-colors duration-200">
       {/* Decorative luxury gradient background glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] bg-gradient-to-b from-primary-500/5 to-transparent blur-[120px] pointer-events-none rounded-full" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] bg-gradient-to-b from-primary-500/8 to-transparent blur-[120px] pointer-events-none rounded-full" />
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary-500/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-accent-500/8 rounded-full blur-[100px] pointer-events-none" />
       
       <div className="w-full max-w-md z-10 animate-fade-in">
         <div className="saas-card bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xl relative overflow-hidden">
           {/* School branding header */}
           <div className="text-center mb-8">
-            <div className="w-14 h-14 rounded-2xl bg-primary-50 dark:bg-primary-950/40 flex items-center justify-center text-primary-500 dark:text-primary-400 mx-auto mb-4 border border-primary-100/50 dark:border-primary-900/50">
-              <Landmark size={26} />
+            <div className="flex justify-center mb-5">
+              <div className="bg-white p-3 rounded-2xl border border-slate-100/80 shadow-sm flex items-center justify-center max-w-[260px] transition-all hover:scale-[1.02] hover:shadow-md">
+                <img src={logo} alt="SPCS Logo" className="h-14 w-auto object-contain" />
+              </div>
             </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Smart Parent Calling</h1>
+            <h1 className="text-xl font-bold tracking-tight text-slate-850 dark:text-white">Smart Parent Calling</h1>
             <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold mt-1 uppercase tracking-wider">Oakridge SPCS Gateway</p>
           </div>
 
@@ -84,7 +89,7 @@ export const Login: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="premium-input !pl-10"
-                  placeholder="admin@spcs.com"
+                  placeholder="Enter your email"
                   required
                 />
               </div>
@@ -155,20 +160,6 @@ export const Login: React.FC = () => {
             </button>
           </form>
 
-          {/* Credentials tips */}
-          <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800/80 text-center">
-            <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Demo Credentials</span>
-            <div className="flex justify-center gap-4 mt-2 text-[11px] font-semibold text-slate-500 dark:text-slate-455">
-              <div>
-                <span>Email: </span>
-                <span className="font-bold text-slate-700 dark:text-slate-350">admin@spcs.com</span>
-              </div>
-              <div>
-                <span>Password: </span>
-                <span className="font-bold text-slate-700 dark:text-slate-350">Admin@123</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
