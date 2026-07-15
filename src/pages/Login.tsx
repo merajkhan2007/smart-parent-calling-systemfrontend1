@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { Lock, Mail, Eye, EyeOff, Loader2 } from "lucide-react";
-import logo from "../assets/logo.png";
 
 export const Login: React.FC = () => {
   const { login } = useAuth();
@@ -67,13 +66,8 @@ export const Login: React.FC = () => {
         <div className="saas-card bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xl relative overflow-hidden">
           {/* School branding header */}
           <div className="text-center mb-8">
-            <div className="flex justify-center mb-5">
-              <div className="bg-white p-3 rounded-2xl border border-slate-100/80 shadow-sm flex items-center justify-center max-w-[260px] transition-all hover:scale-[1.02] hover:shadow-md">
-                <img src={logo} alt="SPCS Logo" className="h-14 w-auto object-contain" />
-              </div>
-            </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-850 dark:text-white">Smart Parent Calling</h1>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold mt-1 uppercase tracking-wider">Oakridge SPCS Gateway</p>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Smart Parent Calling</h1>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 font-bold mt-1.5 uppercase tracking-wider">Oakridge SPCS Gateway</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
