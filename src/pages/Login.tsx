@@ -46,8 +46,14 @@ export const Login: React.FC = () => {
         <div className="saas-card bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xl relative overflow-hidden">
           {/* School branding header */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Smart Parent Calling</h1>
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 font-bold mt-1.5 uppercase tracking-wider">IMPACT ARROWS SPCS Gateway</p>
+            <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 bg-clip-text text-transparent dark:from-white dark:via-slate-100 dark:to-accent-400">
+              Smart Parent Calling
+            </h1>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold mt-2.5 uppercase tracking-widest flex items-center justify-center gap-1.5">
+              <span className="text-accent-500 dark:text-accent-400 font-extrabold">IMPACT ARROWS</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800" />
+              <span className="font-semibold text-slate-450 dark:text-slate-400">SPCS Gateway</span>
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
