@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { 
@@ -18,12 +19,15 @@ import {
 export const Students: React.FC = () => {
   const { apiFetch, user } = useAuth();
   const { addToast } = useToast();
+  const [searchParams] = useSearchParams();
+  const urlSearch = searchParams.get("search") || "";
 
   const [students, setStudents] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(urlSearch);
+  const [activeSearch, setActiveSearch] = useState(urlSearch);
   const [classFilter, setClassFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   
@@ -57,7 +61,7 @@ export const Students: React.FC = () => {
   const fetchStudents = async () => {
     setLoading(true);
     try {
-      const url = `/api/students/?page=${page}&limit=${limit}&query=${search}&class_name=${classFilter}&status=${statusFilter}`;
+      const url = `/api/students/?page=${page}&limit=${limit}&query=${activeSearch}&class_name=${classFilter}&status=${statusFilter}`;
       const data = await apiFetch(url);
       setStudents(data.students || []);
       setTotal(data.total || 0);
@@ -71,12 +75,19 @@ export const Students: React.FC = () => {
 
   useEffect(() => {
     fetchStudents();
-  }, [page, classFilter, statusFilter]);
+  }, [page, classFilter, statusFilter, activeSearch]);
+
+  // Sync URL search parameter changes
+  useEffect(() => {
+    setSearch(urlSearch);
+    setPage(1);
+    setActiveSearch(urlSearch);
+  }, [urlSearch]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
-    fetchStudents();
+    setActiveSearch(search);
   };
 
   // Open Create Form

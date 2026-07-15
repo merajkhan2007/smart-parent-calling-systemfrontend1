@@ -48,6 +48,15 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [unreadNotifications, setUnreadNotifications] = useState<any[]>([]);
   const [schools, setSchools] = useState<any[]>([]);
   const [activeSettings, setActiveSettings] = useState<any>(null);
+  const [globalSearch, setGlobalSearch] = useState("");
+
+  const handleGlobalSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (globalSearch.trim()) {
+      navigate(`/students?search=${encodeURIComponent(globalSearch.trim())}`);
+      setGlobalSearch("");
+    }
+  };
 
   // Fetch settings dynamically to obtain current school name & logo
   const fetchSettings = () => {
@@ -254,16 +263,18 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </button>
 
             {/* Search Bar */}
-            <div className="relative max-w-xs w-full hidden md:block">
+            <form onSubmit={handleGlobalSearch} className="relative max-w-xs w-full hidden md:block">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                 <Search size={14} />
               </div>
               <input
                 type="text"
+                value={globalSearch}
+                onChange={(e) => setGlobalSearch(e.target.value)}
                 className="block w-full pl-9 pr-4 py-1.5 bg-slate-50 hover:bg-slate-100/50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs placeholder-slate-450 focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/5 transition-all font-medium text-slate-700 dark:text-slate-200"
                 placeholder="Search database..."
               />
-            </div>
+            </form>
           </div>
 
           <div className="flex items-center gap-3">
