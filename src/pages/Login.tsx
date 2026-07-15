@@ -34,26 +34,6 @@ export const Login: React.FC = () => {
     }
   };
 
-  const handleForgotPassword = async () => {
-    if (!email) {
-      addToast("warning", "Please enter your email first");
-      return;
-    }
-    try {
-      const res = await fetch("/api/auth/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      if (res.ok) {
-        addToast("info", "Password reset instructions sent (simulated)");
-      } else {
-        addToast("error", "Email not registered");
-      }
-    } catch (e) {
-      addToast("error", "Network error. Try again.");
-    }
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-bg-base dark:bg-slate-950 font-sans relative overflow-hidden transition-colors duration-200">
@@ -91,16 +71,7 @@ export const Login: React.FC = () => {
 
             {/* Password Field */}
             <div className="space-y-1.5">
-              <div className="flex justify-between items-center">
-                <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Password</label>
-                <button
-                  type="button"
-                  onClick={handleForgotPassword}
-                  className="text-xs text-primary-500 hover:text-primary-600 dark:text-primary-400 dark:hover:text-primary-300 font-bold transition-colors"
-                >
-                  Forgot?
-                </button>
-              </div>
+              <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                   <Lock size={15} />
