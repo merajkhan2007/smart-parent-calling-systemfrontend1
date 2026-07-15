@@ -141,8 +141,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Volume2 size={16} />
               </div>
               <div className="transition-all duration-200">
-                <span className="font-bold text-sm text-slate-900 dark:text-white tracking-tight truncate max-w-[120px] block">
-                  {currentSchoolName.split(" ")[0]} SPCS
+                <span className="font-bold text-sm text-slate-900 dark:text-white tracking-tight truncate max-w-[150px] block">
+                  Impact Arrows SPCS
                 </span>
                 <p className="text-[8px] text-slate-400 font-bold tracking-wider -mt-0.5 uppercase">Enterprise Dialer</p>
               </div>
