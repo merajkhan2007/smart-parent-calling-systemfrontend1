@@ -103,7 +103,9 @@ export const Devices: React.FC = () => {
       name: deviceName,
       location: deviceLoc,
       classroom: deviceClassroom,
-      school_id: deviceSchoolId ? parseInt(deviceSchoolId) : null
+      school_id: user?.role === "Super Admin"
+        ? (deviceSchoolId ? parseInt(deviceSchoolId) : null)
+        : (user?.school_id || null)
     };
 
     try {
