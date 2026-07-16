@@ -239,23 +239,18 @@ export const Login: React.FC = () => {
                 </div>
               </div>
 
-              {/* Remember me & Forgot Password */}
-              <div className="flex items-center justify-between text-xs mt-4">
-                <div className="flex items-center">
-                  <input
-                    id="remember_me"
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 dark:border-slate-800 text-orange-600 focus:ring-orange-500/20 cursor-pointer"
-                  />
-                  <label htmlFor="remember_me" className="ml-2 block text-slate-500 dark:text-slate-400 select-none cursor-pointer">
-                    Remember this browser
-                  </label>
-                </div>
-                <a href="#" className="font-semibold text-[#ea580c] hover:text-orange-600 transition-colors">
-                  Forgot password?
-                </a>
+              {/* Remember me */}
+              <div className="flex items-center text-xs mt-4">
+                <input
+                  id="remember_me"
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="h-4 w-4 rounded border-slate-300 dark:border-slate-800 text-orange-600 focus:ring-orange-500/20 cursor-pointer"
+                />
+                <label htmlFor="remember_me" className="ml-2 block text-slate-500 dark:text-slate-400 select-none cursor-pointer">
+                  Remember this browser
+                </label>
               </div>
 
               {/* Submit Button */}
