@@ -84,17 +84,6 @@ export const Login: React.FC = () => {
     }
   };
 
-  const fillDemo = (role: 'admin' | 'teacher') => {
-    if (role === 'admin') {
-      setEmail("admin@spcs.com");
-      setPassword("Admin@123");
-      addToast("success", "Filled credentials for School Admin");
-    } else {
-      setEmail("teacher1@spcs.com");
-      setPassword("Teacher@123");
-      addToast("success", "Filled credentials for Teacher");
-    }
-  };
 
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-12 bg-slate-50 dark:bg-slate-950 font-sans overflow-hidden transition-colors duration-300">
@@ -350,39 +339,7 @@ export const Login: React.FC = () => {
               </button>
             </form>
 
-            {/* Quick Demo Credentials Filler */}
-            <div className="mt-6 pt-5 border-t border-slate-150 dark:border-slate-800/60">
-              <p className="text-[10px] font-extrabold uppercase tracking-widest text-center text-slate-400 dark:text-slate-500 mb-3">
-                Quick Demo Access
-              </p>
-              <div className="grid grid-cols-2 gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => fillDemo('admin')}
-                  className="flex flex-col items-center justify-center p-2.5 rounded-xl border border-slate-200/60 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 hover:bg-primary-50/40 dark:hover:bg-primary-950/10 hover:border-primary-500/50 dark:hover:border-primary-500/40 transition-all duration-300 group cursor-pointer"
-                >
-                  <span className="text-[10px] font-extrabold tracking-widest uppercase text-slate-500 dark:text-slate-400 group-hover:text-primary-500 transition-colors">
-                    School Admin
-                  </span>
-                  <span className="text-[9px] text-slate-400 dark:text-slate-500 mt-0.5 truncate max-w-full">
-                    admin@spcs.com
-                  </span>
-                </button>
-                
-                <button
-                  type="button"
-                  onClick={() => fillDemo('teacher')}
-                  className="flex flex-col items-center justify-center p-2.5 rounded-xl border border-slate-200/60 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 hover:bg-accent-50/40 dark:hover:bg-accent-950/10 hover:border-accent-500/50 dark:hover:border-accent-500/40 transition-all duration-300 group cursor-pointer"
-                >
-                  <span className="text-[10px] font-extrabold tracking-widest uppercase text-slate-500 dark:text-slate-400 group-hover:text-accent-500 transition-colors">
-                    Teacher Panel
-                  </span>
-                  <span className="text-[9px] text-slate-400 dark:text-slate-500 mt-0.5 truncate max-w-full">
-                    teacher1@spcs.com
-                  </span>
-                </button>
-              </div>
-            </div>
+
 
             {/* Bottom Security Footer */}
             <div className="flex justify-center items-center gap-3 mt-6 text-[8px] font-extrabold tracking-widest text-slate-400 dark:text-slate-500 uppercase">
