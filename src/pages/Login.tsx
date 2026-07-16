@@ -176,7 +176,7 @@ export const Login: React.FC = () => {
             {/* Header */}
             <div className="text-center mb-5">
               <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
-                Welcome Back
+                Welcome
               </h2>
               <p className="text-xs text-slate-450 dark:text-slate-500 mt-1.5">
                 Sign in to manage RFIDs, Parents & Calling terminals
